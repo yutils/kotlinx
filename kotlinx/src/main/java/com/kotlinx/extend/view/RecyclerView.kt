@@ -121,7 +121,7 @@ fun RecyclerView.clear() {
 
 
 /**
- * 到顶部监听，到顶部后继续滑动，不会触发
+ * 滑动时到顶部监听（到顶部后继续滑动不会触发）
  */
 /*
 binding.rv.toTopListener {
@@ -130,48 +130,141 @@ binding.rv.toTopListener {
  */
 fun RecyclerView.toTopListener(listener: () -> Unit) {
     this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-        //滚动完毕
+        //滚动完毕，没有滑动成功，不会触发
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
+            //不能继续往顶部滑动
             if (!recyclerView.canScrollVertically(-1)) listener.invoke()
         }
     })
 }
 
-/**到底部监听，到底部后继续滑动，不会触发*/
-fun RecyclerView.toBottomListener(listener: () -> Unit) {
+/**
+ * 滑动时不在顶部监听，一旦满足条件会立即触发多次
+ */
+/*
+binding.rv.toTopListener {
+    YToast.show("toTopListener")
+}
+ */
+fun RecyclerView.notToTopListener(listener: () -> Unit) {
     this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-        //滚动完毕
+        //滚动完毕，没有滑动成功，不会触发
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
+            //不能继续往顶部滑动
+            if (recyclerView.canScrollVertically(-1)) listener.invoke()
+        }
+    })
+}
+
+/**滑动时到底部监听（到底部后继续滑动不会触发）（上拉加载）*/
+fun RecyclerView.toBottomListener(listener: () -> Unit) {
+    this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        //滚动完毕，没有滑动成功，不会触发
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            //不能继续往底部滑动
             if (!recyclerView.canScrollVertically(1)) listener.invoke()
         }
     })
 }
 
+/**滑动时不在低部监听，一旦满足条件会立即触发多次*/
+fun RecyclerView.notToBottomListener(listener: () -> Unit) {
+    this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        //滚动完毕，没有滑动成功，不会触发
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            //不能继续往底部滑动
+            if (recyclerView.canScrollVertically(1)) listener.invoke()
+        }
+    })
+}
+
+/**滑动时在顶部和底部之间会触发，一旦满足条件会立即触发多次*/
+fun RecyclerView.toBetweenTopAndBottomListener(listener: () -> Unit) {
+    this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        //滚动完毕，没有滑动成功，不会触发
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            //能继续往顶部滑动，也能继续往底部滑动
+            if (recyclerView.canScrollVertically(1) && recyclerView.canScrollVertically(-1)) listener.invoke()
+        }
+    })
+}
+
+
 /**滑动完成后能看到顶部，会触发 （下拉刷新）*/
 fun RecyclerView.scrollToTopListener(listener: () -> Unit) {
     this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-        //滚动状态改变
+        //滚动状态改变，没有滑动成功，也会触发
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             //newState分 0,1,2三个状态,2是滚动状态,0是停止
             if (newState == 0) {
+                //不能继续往顶部滑动
                 if (!recyclerView.canScrollVertically(-1)) listener.invoke()
             }
         }
     })
 }
 
-/**滑动完成后能看到底部，会触发 （上拉加载）*/
-fun RecyclerView.scrollToBottomListener(listener: () -> Unit) {
+/**滑动完成后不能看到顶部，会触发*/
+fun RecyclerView.scrollNotToTopListener(listener: () -> Unit) {
     this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-        //滚动状态改变
+        //滚动状态改变，没有滑动成功，也会触发
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             //newState分 0,1,2三个状态,2是滚动状态,0是停止
             if (newState == 0) {
+                //不能继续往顶部滑动
+                if (recyclerView.canScrollVertically(-1)) listener.invoke()
+            }
+        }
+    })
+}
+
+/**滑动完成后能看到底部，会触发 */
+fun RecyclerView.scrollToBottomListener(listener: () -> Unit) {
+    this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        //滚动状态改变，没有滑动成功，也会触发
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+            //newState分 0,1,2三个状态,2是滚动状态,0是停止
+            if (newState == 0) {
+                //不能继续往底部滑动
                 if (!recyclerView.canScrollVertically(1)) listener.invoke()
+            }
+        }
+    })
+}
+
+/**滑动完成后不能看到底部，会触发 */
+fun RecyclerView.scrollNotToBottomListener(listener: () -> Unit) {
+    this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        //滚动状态改变，没有滑动成功，也会触发
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+            //newState分 0,1,2三个状态,2是滚动状态,0是停止
+            if (newState == 0) {
+                //不能继续往底部滑动
+                if (recyclerView.canScrollVertically(1)) listener.invoke()
+            }
+        }
+    })
+}
+
+/**滑动完成后在顶部和底部之间会触发*/
+fun RecyclerView.scrollToBetweenTopAndBottomListener(listener: () -> Unit) {
+    this.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        //滚动状态改变，没有滑动成功，也会触发
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            super.onScrollStateChanged(recyclerView, newState)
+            //newState分 0,1,2三个状态,2是滚动状态,0是停止
+            if (newState == 0) {
+                //能继续往顶部滑动，也能继续往底部滑动
+                if (recyclerView.canScrollVertically(1) && recyclerView.canScrollVertically(-1)) listener.invoke()
             }
         }
     })
