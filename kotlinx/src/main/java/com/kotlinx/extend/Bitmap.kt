@@ -6,6 +6,16 @@ import java.io.ByteArrayOutputStream
 
 
 /**
+ * 将bitmap转换成ByteArray
+ */
+/*举例： bitmap.toByteArray() */
+fun Bitmap.toByteArray(): ByteArray {
+    val bos = ByteArrayOutputStream()
+    this.compress(Bitmap.CompressFormat.PNG, 100, bos)
+    return bos.toByteArray()
+}
+
+/**
  * 图片压缩返回byte[]，不一定绝对小于对应大小
  *
  * @param Kb    大小kb

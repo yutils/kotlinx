@@ -10,7 +10,7 @@ package com.kotlinx.extend
     oldItem.id == newItem.id
 }
  */
-public inline fun <T> MutableList<T>.addAndReplace(newList: List<T>, identical: (T, T) -> Boolean): Unit {
+inline fun <T> MutableList<T>.addAndReplace(newList: List<T>, identical: (T, T) -> Boolean): Unit {
     //条件满足，覆盖。如果不存在，添加。
     newList.forEach { newItem ->
         var exist = false

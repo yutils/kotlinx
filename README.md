@@ -1,8 +1,10 @@
-# kotlinx #
-
+# kotlinx
 ## kotlin扩展方法
 
 几乎全采用kotlin扩展方法的方式来扩展kotlin功能。增加易用性。
+
+# 希望更多小伙伴加入和我一起扩充
+
 
 [![platform](https://img.shields.io/badge/platform-Android-lightgrey.svg)](https://developer.android.google.cn/studio/index.html)
 ![Gradle](https://img.shields.io/badge/Gradle-7.5.1-brightgreen.svg)
@@ -27,6 +29,7 @@ dependencies {
 ```
 
 注：如果引用失败，看下面方案
+
 ```
 allprojects {
     repositories {
@@ -41,11 +44,42 @@ Github地址：[https://github.com/yutils/kotlinx](https://github.com/yutils/kot
 
 感谢关注微博：[细雨若静](https://weibo.com/32005200)
 
+### 引入
+```kotlin
+//在application或者MainActivity中加入
+Kotlinx.init(application)
+```
 
 ### 举例：
+
 ```kotlin
+
+//在ui线程弹出一个toast
+"你好".toast()
+
+//判断字符串是否是int
+"123".isInt()
+
+//判断是否是IPv4地址
+"192.168.1.1".isIPv4()
+
+//将字符串写入文件
+"你好".toFile(File("D:/abc.txt"))
+
+//将字符串转换成base64
+"你好".toBase64String()
+
+//将base64字符串转换成String
+"5L2g5aW9".toStringFromBase64()
+
+//读取文件并返回String
+var s = File("D:/abc.txt").toString()
+
+//将bitmap转换成ByteArray
+bitmap.toByteArray()
+
 //给textView增加跑马灯效果
-tv.marquee()
+textView.marquee()
 
 //将bitmap转化成byte数组
 bitmap.toByteArray()
@@ -60,12 +94,12 @@ recyclerView.show(R.layout.user_item, list) { holder, position ->
 }
 
 //滑动完成后，能看到顶部，下拉刷新
-recyclerView.scrollToTopListener{
+recyclerView.scrollToTopListener {
     //刷新逻辑
 }
 
 //滑动完成后能看到底部监听，上拉加载
-recyclerView.scrollToBottomListener{
+recyclerView.scrollToBottomListener {
     //加载逻辑
 }
 ```

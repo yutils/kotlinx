@@ -18,6 +18,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kotlinx.Kotlinx
+import com.kotlinx.extend.toBase64String
+import com.kotlinx.extend.toStringFromBase64
+import com.kotlinx.extend.toast
 import com.kotlinx.test.ui.theme.KotlinxTheme
 
 class MainActivity : ComponentActivity() {
@@ -28,6 +32,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         context = this
+        Kotlinx.init(application)
         setContent {
             KotlinxTheme {
                 // A surface container using the 'background' color from the theme
@@ -49,9 +54,8 @@ fun Greeting(name: String) {
         Row {
             Text("细雨若静❤！", fontSize = 30.sp)
             Text("Android开发测试", color = Color.Blue, modifier = Modifier
-                .clickable { show("点击一下") }
+                .clickable { }
                 .padding(10.dp))
-            Text("哈哈哈哈")
         }
 
         Row(
@@ -59,23 +63,24 @@ fun Greeting(name: String) {
                 .fillMaxWidth()
                 .background(color = Color.Cyan), horizontalArrangement = Arrangement.SpaceAround
         ) {
+            var i = 0
+            Button(onClick = {
+                Thread { "点击一下${i++}".toast() }.start()
+            }) {
+                Text("测试1")
+            }
 
             Button(onClick = {
-                Toast.makeText(MainActivity.context, "点击一下", Toast.LENGTH_LONG).show()
+                println("你好".toBase64String())
+                println("你好".toBase64String().toStringFromBase64())
             }) {
-                Text("是我")
+                Text("测试2")
             }
 
             Button(onClick = {
                 Toast.makeText(MainActivity.context, "点击一下", Toast.LENGTH_LONG).show()
             }) {
-                Text("是我")
-            }
-
-            Button(onClick = {
-                Toast.makeText(MainActivity.context, "点击一下", Toast.LENGTH_LONG).show()
-            }) {
-                Text("是我")
+                Text("测试3")
             }
         }
     }

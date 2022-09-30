@@ -4,7 +4,7 @@ import android.text.TextUtils
 import android.widget.TextView
 
 /**
- * 跑马灯
+ * 跑马灯效果
  */
 fun TextView.marquee() {
     this.isSingleLine = true
