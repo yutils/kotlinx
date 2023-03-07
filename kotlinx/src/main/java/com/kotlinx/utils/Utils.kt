@@ -1,7 +1,5 @@
 package com.kotlinx.utils
 
-import android.annotation.SuppressLint
-import android.app.Application
 import android.os.Build
 import android.os.Handler
 import android.os.Looper

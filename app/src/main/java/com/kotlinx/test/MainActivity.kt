@@ -19,9 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kotlinx.Kotlinx
-import com.kotlinx.extend.toBase64String
-import com.kotlinx.extend.toStringFromBase64
-import com.kotlinx.extend.toast
+import com.kotlinx.extend.*
 import com.kotlinx.test.ui.theme.KotlinxTheme
 
 class MainActivity : ComponentActivity() {
@@ -65,7 +63,7 @@ fun Greeting(name: String) {
         ) {
             var i = 0
             Button(onClick = {
-                Thread { "点击一下${i++}".toast() }.start()
+                Thread { "点击一下${i++}".toast().speak().logI() }.start()
             }) {
                 Text("测试1")
             }

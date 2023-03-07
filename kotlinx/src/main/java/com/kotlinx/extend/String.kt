@@ -1,9 +1,11 @@
 package com.kotlinx.extend
 
 import android.util.Base64
+import android.util.Log
 import android.widget.Toast
 import com.kotlinx.Kotlinx.app
 import com.kotlinx.Kotlinx.toast
+import com.kotlinx.utils.TTS
 import com.kotlinx.utils.ui
 import java.io.File
 import java.nio.charset.Charset
@@ -140,6 +142,55 @@ fun String.isBankCard(): Boolean {
     return isBankCard(this)
 }
 
+
+/**调用TTS播放文字语音*/
+/*举例： "你好".speak() */
+fun String.speak(): String {
+    TTS.speak(this)
+    return this
+}
+
+/**调用TTS播放文字语音放入队列*/
+/*举例： "你好".speakQueue() */
+fun String.speakQueue(): String {
+    TTS.speakQueue(this)
+    return this
+}
+
+/**打印日志*/
+/*举例： "注意".logV() */
+fun String.logV(): String {
+    Log.v("VERBOSE",this)
+    return this
+}
+
+/**打印日志*/
+/*举例： "注意".logD() */
+fun String.logD(): String {
+    Log.d("DEBUG",this)
+    return this
+}
+
+/**打印日志*/
+/*举例： "注意".logI() */
+fun String.logI(): String {
+    Log.i("INFO",this)
+    return this
+}
+
+/**打印日志*/
+/*举例： "注意".logW() */
+fun String.logW(): String {
+    Log.w(" WARN",this)
+    return this
+}
+
+/**打印日志*/
+/*举例： "注意".logE() */
+fun String.logE(): String {
+    Log.e("ERROR",this)
+    return this
+}
 
 /**在ui线程弹出一个toast*/
 /*举例： "你好".toast() */

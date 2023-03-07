@@ -7,10 +7,10 @@
 
 
 [![platform](https://img.shields.io/badge/platform-Android-lightgrey.svg)](https://developer.android.google.cn/studio/index.html)
-![Gradle](https://img.shields.io/badge/Gradle-7.5.1-brightgreen.svg)
+![Gradle](https://img.shields.io/badge/Gradle-7.6-brightgreen.svg)
 [![last commit](https://img.shields.io/github/last-commit/yutils/kotlinx.svg)](https://github.com/yutils/kotlinx/commits/master)
 ![repo size](https://img.shields.io/github/repo-size/yutils/kotlinx.svg)
-![android studio](https://img.shields.io/badge/android%20studio-2021.3.1-green.svg)
+![android studio](https://img.shields.io/badge/android%20studio-2022.1.1-green.svg)
 [![maven](https://img.shields.io/badge/maven-address-green.svg)](https://search.maven.org/artifact/com.kotlinx/kotlinx)
 
 ## 已经从jitpack.io仓库移动至maven中央仓库
@@ -33,7 +33,7 @@ dependencies {
 ```
 allprojects {
     repositories {
-     //如果拉取不了
+     //如果拉取不了，再加入
      maven { url 'http://maven.kotlinx.com:8081/repository/maven-public'; allowInsecureProtocol = true }
     }
 ```
@@ -56,6 +56,12 @@ Kotlinx.init(application)
 
 //在ui线程弹出一个toast
 "你好".toast()
+
+//调用TTS语音
+"你好".speak()
+
+//打印日志
+"你好".logI()
 
 //判断字符串是否是int
 "123".isInt()
