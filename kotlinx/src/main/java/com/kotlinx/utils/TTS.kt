@@ -1,6 +1,5 @@
 package com.kotlinx.utils
 
-
 import android.content.Context
 import android.os.Build
 import android.speech.tts.TextToSpeech
