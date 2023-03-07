@@ -4,10 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Base64
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
 import java.util.*
 
 /**
@@ -61,7 +58,7 @@ fun ByteArray.toBitmap(): Bitmap? {
  * ByteArray转换成file并写入储存
  */
 fun ByteArray.toFile(file: File): Boolean {
-    if (!Objects.requireNonNull(file.parentFile).exists()) // 如果位置不存在
+    if (!file.parentFile.exists()) // 如果位置不存在
         file.parentFile?.mkdirs()
     if (file.exists()) file.delete()
     val out: FileOutputStream
@@ -75,6 +72,28 @@ fun ByteArray.toFile(file: File): Boolean {
         return false
     } catch (e: IOException) {
         println("IO Error")
+        return false
+    }
+    return true
+}
+
+/**
+ * ByteArray添加到file
+ */
+fun ByteArray.addFile(file: File): Boolean {
+    try {
+        if (!file.parentFile.exists()) // 如果位置不存在
+            file.parentFile.mkdirs()
+        // 打开一个随机访问文件流，按读写方式
+        val randomFile = RandomAccessFile(file, "rw")
+        // 文件长度，字节数
+        val fileLength = randomFile.length()
+        // 将写文件指针移到文件尾。
+        randomFile.seek(fileLength)
+        randomFile.write(this)
+        randomFile.close()
+    } catch (e: IOException) {
+        e.printStackTrace()
         return false
     }
     return true

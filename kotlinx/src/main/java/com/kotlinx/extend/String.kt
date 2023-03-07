@@ -5,10 +5,13 @@ import android.util.Log
 import android.widget.Toast
 import com.kotlinx.Kotlinx.app
 import com.kotlinx.Kotlinx.toast
+import com.kotlinx.utils.ExternalFile
 import com.kotlinx.utils.TTS
 import com.kotlinx.utils.ui
 import java.io.File
 import java.nio.charset.Charset
+import java.text.SimpleDateFormat
+import java.util.*
 
 /** 判断是否是Int*/
 /*举例： "123".isInt() */
@@ -159,36 +162,41 @@ fun String.speakQueue(): String {
 
 /**打印日志*/
 /*举例： "注意".logV() */
-fun String.logV(): String {
-    Log.v("VERBOSE",this)
+fun String.logV(tag: String = "VERBOSE"): String {
+    Log.v(tag, this)
+    LogListener?.invoke(Log.VERBOSE, tag, this, null)
     return this
 }
 
 /**打印日志*/
 /*举例： "注意".logD() */
-fun String.logD(): String {
-    Log.d("DEBUG",this)
+fun String.logD(tag: String = "DEBUG"): String {
+    Log.d(tag, this)
+    LogListener?.invoke(Log.DEBUG, tag, this, null)
     return this
 }
 
 /**打印日志*/
 /*举例： "注意".logI() */
-fun String.logI(): String {
-    Log.i("INFO",this)
+fun String.logI(tag: String = "INFO"): String {
+    Log.i(tag, this)
+    LogListener?.invoke(Log.INFO, tag, this, null)
     return this
 }
 
 /**打印日志*/
 /*举例： "注意".logW() */
-fun String.logW(): String {
-    Log.w(" WARN",this)
+fun String.logW(tag: String = "WARN"): String {
+    Log.w(tag, this)
+    LogListener?.invoke(Log.WARN, tag, this, null)
     return this
 }
 
 /**打印日志*/
 /*举例： "注意".logE() */
-fun String.logE(): String {
-    Log.e("ERROR",this)
+fun String.logE(tag: String = "ERROR", t: Throwable? = null): String {
+    if (t == null) Log.e(tag, this) else Log.e(tag, this, t)
+    LogListener?.invoke(Log.ERROR, tag, this, t)
     return this
 }
 
@@ -254,20 +262,59 @@ fun String.toFile(file: File, charset: Charset = Charset.defaultCharset()) {
     this.toByteArray(charset).toFile(file)
 }
 
+fun String.toFile(path: String, charset: Charset = Charset.defaultCharset()) {
+    this.toFile(File(path),charset)
+}
+
+/**外部储存读取文件成String*/
+/*
+var ip: String
+    get() = "服务器IP.txt".readPath() ?: "127.0.0.1"
+    set(value) = value.writePath("服务器IP.txt" )
+ */
+fun String.readPath(): String? {
+    return File(ExternalFile.getDir() + "/" + this).string()
+}
+
+/**写入文本到外部储存*/
+/*
+var port: Int
+    get() = "端口.txt".readPath()?.toInt() ?: 8080
+    set(value) = value.toString().writePath("端口.txt")
+ */
+fun String?.writePath(fileName: String) {
+    (this ?: "").toFile(ExternalFile.getDir() + "/" + fileName)
+}
+
+/**将字符串添加到文件*/
+/*举例 "你好".addFile(File("D:/abc.txt")) */
+fun String.addFile(file: File, charset: Charset = Charset.defaultCharset()) {
+    this.toByteArray(charset).addFile(file)
+}
+fun String.addFile(path: String, charset: Charset = Charset.defaultCharset()) {
+    this.addFile(File(path),charset)
+}
 
 /**将字符串转换成base64*/
-fun String.toBase64(charset: Charset = Charset.defaultCharset()):ByteArray {
-  return  this.toByteArray(charset).toBase64Encode()
+fun String.toBase64(charset: Charset = Charset.defaultCharset()): ByteArray {
+    return this.toByteArray(charset).toBase64Encode()
 }
 
 /**将字符串转换成base64*/
 /*举例："你好".toBase64String()*/
-fun String.toBase64String(charset: Charset = Charset.defaultCharset()):String {
-    return  this.toByteArray(charset).toBase64EncodeToString()
+fun String.toBase64String(charset: Charset = Charset.defaultCharset()): String {
+    return this.toByteArray(charset).toBase64EncodeToString()
 }
 
 /**将base64字符串转换成String*/
 /*举例："5L2g5aW9".toStringFromBase64()*/
-fun String.toStringFromBase64(charset: Charset = Charset.defaultCharset()):String {
-    return String(this.toByteArray(charset).toBase64Decode(),charset)
+fun String.toStringFromBase64(charset: Charset = Charset.defaultCharset()): String {
+    return String(this.toByteArray(charset).toBase64Decode(), charset)
+}
+
+/** 将日期格式的文本转换成Date**/
+/*举例："5L2g5aW9".toStringFromBase64()*/
+fun String.parseDate(dateStyle: String = "yyyy-MM-dd HH:mm:ss"): Date? {
+    val sdf = SimpleDateFormat(dateStyle, Locale.getDefault())
+    return sdf.parse(this)
 }
