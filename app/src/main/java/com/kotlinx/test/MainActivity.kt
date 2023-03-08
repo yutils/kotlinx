@@ -60,10 +60,9 @@ fun Greeting(name: String) {
         Row {
             Text("细雨若静❤！", fontSize = 30.sp)
             Text("Android开发测试", color = Color.Blue, modifier = Modifier
-                .clickable { }
+                .clickable {}
                 .padding(10.dp))
         }
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
