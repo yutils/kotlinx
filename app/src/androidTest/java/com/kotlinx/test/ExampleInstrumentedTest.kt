@@ -2,6 +2,8 @@ package com.kotlinx.test
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.kotlinx.extend.logI
+import com.kotlinx.extend.showStackTrace
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,4 +23,10 @@ class ExampleInstrumentedTest {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         assertEquals("com.kotlinx.test", appContext.packageName)
     }
+    @Test
+    fun test2() {
+        "---------------------------------".logI().showStackTrace()
+        println("---------------------------------".showStackTrace())
+    }
+
 }

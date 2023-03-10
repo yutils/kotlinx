@@ -24,7 +24,7 @@ recyclerView.show(R.layout.user_item, list) { holder, position ->
     val binding = holder.binding as UserItemBinding
     val item = list[position]
 }.onItemClickListener = { position ->
-    YToast.show("第$position行被点击了")
+    "第${position}行被点击了".toast()
 }
  */
 fun <T> RecyclerView.show(layout: Int, list: MutableList<T>, listener: ((holder: BaseHolder, position: Int) -> Unit)? = null): BaseAdapter<T> {
@@ -125,7 +125,7 @@ fun RecyclerView.clear() {
  */
 /*
 binding.rv.toTopListener {
-    YToast.show("toTopListener")
+    "toTopListener".toast()
 }
  */
 inline fun RecyclerView.toTopListener(crossinline listener: () -> Unit) {
@@ -144,7 +144,7 @@ inline fun RecyclerView.toTopListener(crossinline listener: () -> Unit) {
  */
 /*
 binding.rv.toTopListener {
-    YToast.show("toTopListener")
+   "toTopListener".toast()
 }
  */
 inline fun RecyclerView.notToTopListener(crossinline listener: () -> Unit) {
@@ -334,17 +334,15 @@ class BaseHolder(var binding: ViewDataBinding) : RecyclerView.ViewHolder(binding
 class UserAdapter(var data: List<User>) : BaseAdapter<User>(R.layout.user_item, data) {
     override fun item(holder: BaseHolder, position: Int) {
         val binding = holder.binding as UserItemBinding
-        val item = list?.get(position) as User
-
+        val item = list[position] as User
         binding.user = item
-        binding.iv.setOnClickListener { YToast.show("点击：" + item.name) }
+        binding.iv.setOnClickListener { ("点击：" + item.name).toast() }
     }
 }
-
 class UserAdapter<T>(var data: List<T>) : BaseAdapter<T>(R.layout.user_item, data) {
     override fun item(holder: BaseHolder, position: Int) {
         val binding = holder.binding as UserItemBinding
-        val item = list?.get(position) as User
+        val item = list[position] as User
     }
 }
 
@@ -353,13 +351,12 @@ val list :MutableList<String> =ArrayList()
 list.add("A")
 list.add("B")
 list.add("C")
-
 val adapter = object : BaseAdapter<String>(R.layout.user_item, list) {
     override fun item(holder: BaseHolder, position: Int) {
         val binding = holder.binding as UserItemBinding
-        val item = list?.get(position) as String
+        val item = list[position]
         binding.tvName.text = item
-        binding.iv.setOnClickListener { YToast.show("点击图片：" + item) }
+        binding.iv.setOnClickListener { ("点击图片：" + item).toast() }
     }
 }
 
@@ -371,9 +368,9 @@ class CarAdapter<T>(var list: List<T>?) : RecyclerView.Adapter<MyViewHolder>() {
         return MyViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.activity_list_item, parent, false))
     }
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val item = list?.get(position) as User
+        val item = list[position] as User
         holder.binding.data = item
-        holder.binding.iv.setOnClickListener { YToast.show("点击：" + item.name) }
+        holder.binding.iv.setOnClickListener { ("点击：" + item.name).toast() }
         //必须要有这行，防止闪烁
         holder.binding.executePendingBindings()
     }

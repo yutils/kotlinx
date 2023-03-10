@@ -4,15 +4,19 @@ import android.util.Log
 import java.util.*
 
 fun <T> T.showStackTrace(type: Int = Log.INFO): T {
-    getLine(1)?.let {
-        when (type) {
-            Log.VERBOSE -> it.logV("StackTrace")
-            Log.DEBUG -> it.logD("StackTrace")
-            Log.INFO -> it.logI("StackTrace")
-            Log.WARN -> it.logW("StackTrace")
-            Log.ERROR -> it.logE("StackTrace")
-            else -> {}
+    try {
+        getLine(2)?.let {
+            when (type) {
+                Log.VERBOSE -> it.logV("StackTrace")
+                Log.DEBUG -> it.logD("StackTrace")
+                Log.INFO -> it.logI("StackTrace")
+                Log.WARN -> it.logW("StackTrace")
+                Log.ERROR -> it.logE("StackTrace")
+                else -> {}
+            }
         }
+    }catch (e:Exception){
+        e.printStackTrace()
     }
     return this
 }

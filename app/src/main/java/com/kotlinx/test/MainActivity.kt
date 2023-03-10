@@ -81,13 +81,10 @@ fun Greeting(name: String) {
                 Text("测试2")
             }
 
-
             Button(onClick = {
                 Toast.makeText(MainActivity.context, "点击一下", Toast.LENGTH_LONG).show()
                 showStackTrace()
-
-                "测试文字111111111111111111111111111111".logI()
-
+                "测试".toast().speak().logE().showStackTrace()
             }) {
                 Text("测试3")
             }

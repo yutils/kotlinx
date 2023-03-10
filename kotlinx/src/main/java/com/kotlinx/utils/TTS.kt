@@ -42,7 +42,7 @@ object TTS {
     var speechRate = 1.0f //速度
     var pitch = 1.0f //音调
     var filter: ((String) -> String?)? = null
-    var SHOW_LOG = true //是否显示log
+    var SHOW_LOG = false //是否显示log
     var history = mutableListOf<String>()//历史记录，倒序，最多1000条
 
     /**

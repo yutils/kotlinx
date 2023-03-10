@@ -21,6 +21,8 @@ object Kotlinx {
 
     @JvmStatic
     fun destroy() {
+        app = null
+        toast = null
         TTS.destroy()
     }
 }

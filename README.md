@@ -1,10 +1,10 @@
 # kotlinx
+
 ## kotlin扩展方法
 
 几乎全采用kotlin扩展方法的方式来扩展kotlin功能。增加易用性。
 
 # 希望更多小伙伴加入和我一起扩充
-
 
 [![platform](https://img.shields.io/badge/platform-Android-lightgrey.svg)](https://developer.android.google.cn/studio/index.html)
 ![Gradle](https://img.shields.io/badge/Gradle-7.6-brightgreen.svg)
@@ -19,12 +19,12 @@
 
 ## Gradle 引用
 
-[添加依赖，当前最新版：————> 1.0.5　　　　![最新版](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88-1.0.5-green.svg)](https://search.maven.org/artifact/com.kotlinx/kotlinx)
+[添加依赖，当前最新版：————> 1.0.6　　　　![最新版](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88-1.0.6-green.svg)](https://search.maven.org/artifact/com.kotlinx/kotlinx)
 
 ```
 dependencies {
      //更新地址  https://github.com/yutils/kotlinx 建议过几天访问看下有没有新版本
-     implementation 'com.kotlinx:kotlinx:1.0.5'
+     implementation 'com.kotlinx:kotlinx:1.0.6'
 }
 ```
 
@@ -45,6 +45,7 @@ Github地址：[https://github.com/yutils/kotlinx](https://github.com/yutils/kot
 感谢关注微博：[细雨若静](https://weibo.com/32005200)
 
 ### 引入
+
 ```kotlin
 //在application或者MainActivity中加入
 Kotlinx.init(application)
@@ -62,6 +63,9 @@ Kotlinx.init(application)
 
 //打印日志
 "你好".logI()
+
+//toast，tts，日志，显示行号
+"错误".toast().speak().logE().showStackTrace()
 
 //判断字符串是否是int
 "123".isInt()
@@ -96,7 +100,7 @@ recyclerView.show(R.layout.user_item, list) { holder, position ->
     val binding = holder.binding as UserItemBinding
     val item = list[position]
 }.onItemClickListener = { position ->
-    YToast.show("第$position行被点击了")
+    "第${position}行被点击了".toast()
 }
 
 //滑动完成后，能看到顶部，下拉刷新
