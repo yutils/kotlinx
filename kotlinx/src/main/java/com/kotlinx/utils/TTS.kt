@@ -3,8 +3,9 @@ package com.kotlinx.utils
 import android.content.Context
 import android.os.Build
 import android.speech.tts.TextToSpeech
-import android.util.Log
 import com.kotlinx.Kotlinx
+import com.kotlinx.extend.logE
+import com.kotlinx.extend.logI
 import com.kotlinx.extend.toast
 import java.util.*
 
@@ -59,20 +60,20 @@ object TTS {
                 val result = textToSpeech!!.setLanguage(Locale.CHINA)
                 initState = when (result) {
                     TextToSpeech.LANG_MISSING_DATA -> {
-                        Log.e(TAG, "TTS初始化失败，语言包丢失")
+                        if (SHOW_LOG) "TTS初始化失败，语言包丢失".logE(TAG)
                         1
                     }
                     TextToSpeech.LANG_NOT_SUPPORTED -> {
-                        Log.e(TAG, "TTS初始化失败，语音不支持")
+                        if (SHOW_LOG) "TTS初始化失败，语音不支持".logE(TAG)
                         2
                     }
                     else -> {
-                        Log.i(TAG, "TTS初始化成功")
+                        if (SHOW_LOG) "TTS初始化成功".logI(TAG)
                         0
                     }
                 }
             } else {
-                Log.e(TAG, "TTS初始化失败:$status")
+                if (SHOW_LOG) "TTS初始化失败:$status".logE(TAG)
                 initState = 3
             }
             initListener?.invoke(initState == 0)
@@ -106,7 +107,7 @@ object TTS {
         } else {
             textToSpeech?.speak(speak, TextToSpeech.QUEUE_FLUSH, null)
         }
-        if (SHOW_LOG) Log.i(TAG, "TTS: $speak")
+        if (SHOW_LOG) "$speak".logI(TAG)
         history.add(0, speak)
         if (history.size > 1000) history.removeAt(history.size - 1)
     }
@@ -186,7 +187,7 @@ object TTS {
         } else {
             textToSpeech?.speak(speak, TextToSpeech.QUEUE_ADD, null)
         }
-        if (SHOW_LOG) Log.i(TAG, "TTS: $speak")
+        if (SHOW_LOG) "$speak".logI(TAG)
         history.add(0, speak)
         if (history.size > 1000) history.removeAt(history.size - 1)
     }

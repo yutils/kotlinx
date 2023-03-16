@@ -160,43 +160,45 @@ fun String.speakQueue(): String {
     return this
 }
 
-/**打印日志*/
+/**打印日志，可以打印任意长度字符串，超过4000Bit（二进制数位）自动换行*/
 /*举例： "注意".logV() */
 fun String.logV(tag: String = "VERBOSE"): String {
-    Log.v(tag, this)
     LogListener?.invoke(Log.VERBOSE, tag, this, null)
+    this.groupActual(4000).forEach { Log.v(tag, it.toString()) }
     return this
 }
 
-/**打印日志*/
+/**打印日志，可以打印任意长度字符串，超过4000Bit（二进制数位）自动换行*/
 /*举例： "注意".logD() */
 fun String.logD(tag: String = "DEBUG"): String {
-    Log.d(tag, this)
     LogListener?.invoke(Log.DEBUG, tag, this, null)
+    this.groupActual(4000).forEach { Log.d(tag, it.toString()) }
     return this
 }
 
-/**打印日志*/
+/**打印日志，可以打印任意长度字符串，超过4000Bit（二进制数位）自动换行*/
 /*举例： "注意".logI() */
 fun String.logI(tag: String = "INFO"): String {
-    Log.i(tag, this)
     LogListener?.invoke(Log.INFO, tag, this, null)
+    this.groupActual(4000).forEach { Log.i(tag, it.toString()) }
     return this
 }
 
-/**打印日志*/
+/**打印日志，可以打印任意长度字符串，超过4000Bit（二进制数位）自动换行*/
 /*举例： "注意".logW() */
 fun String.logW(tag: String = "WARN"): String {
-    Log.w(tag, this)
     LogListener?.invoke(Log.WARN, tag, this, null)
+    this.groupActual(4000).forEach { Log.w(tag, it.toString()) }
     return this
 }
 
-/**打印日志*/
+/**打印日志，可以打印任意长度字符串，超过4000Bit（二进制数位）自动换行*/
 /*举例： "注意".logE() */
 fun String.logE(tag: String = "ERROR", t: Throwable? = null): String {
-    if (t == null) Log.e(tag, this) else Log.e(tag, this, t)
     LogListener?.invoke(Log.ERROR, tag, this, t)
+    this.groupActual(4000).forEach {
+        if (t == null) Log.e(tag, it.toString()) else Log.e(tag, it.toString(), t)
+    }
     return this
 }
 
@@ -263,7 +265,7 @@ fun String.toFile(file: File, charset: Charset = Charset.defaultCharset()) {
 }
 
 fun String.toFile(path: String, charset: Charset = Charset.defaultCharset()) {
-    this.toFile(File(path),charset)
+    this.toFile(File(path), charset)
 }
 
 /**外部储存读取文件成String*/
@@ -291,8 +293,9 @@ fun String?.writePath(fileName: String) {
 fun String.addFile(file: File, charset: Charset = Charset.defaultCharset()) {
     this.toByteArray(charset).addFile(file)
 }
+
 fun String.addFile(path: String, charset: Charset = Charset.defaultCharset()) {
-    this.addFile(File(path),charset)
+    this.addFile(File(path), charset)
 }
 
 /**将字符串转换成base64*/
@@ -312,9 +315,161 @@ fun String.toStringFromBase64(charset: Charset = Charset.defaultCharset()): Stri
     return String(this.toByteArray(charset).toBase64Decode(), charset)
 }
 
-/** 将日期格式的文本转换成Date**/
-/*举例："5L2g5aW9".toStringFromBase64()*/
-fun String.parseDate(dateStyle: String = "yyyy-MM-dd HH:mm:ss"): Date? {
-    val sdf = SimpleDateFormat(dateStyle, Locale.getDefault())
-    return sdf.parse(this)
+/**
+ * 字符串分组，每digit位字符拆分一次字符串，中文英文都算一个字符
+ * @param digit 位
+ * @return 拆分后的字符串
+ */
+/*
+举例：
+    "你好啊1234567890".group(3).forEach {
+        println(it.toString())
+    }
+结果：
+    你好啊
+    123
+    456
+    789
+    0
+*/
+fun String.group(digit: Int): List<StringBuilder> {
+    if (this.length < digit) {
+        val strings: MutableList<StringBuilder> = ArrayList()
+        strings.add(StringBuilder(this))
+        return strings
+    }
+    val strings: MutableList<StringBuilder> = ArrayList()
+    var sb = StringBuilder()
+    for (i in 0 until this.length) {
+        val c = this[i] //获取每一个字
+        sb.append(c)
+        if (i % digit == digit - 1) { //如果是digit的倍数就换行
+            strings.add(sb)
+            sb = StringBuilder()
+        }
+    }
+    if (sb.isNotEmpty()) strings.add(sb)
+    return strings
+}
+
+
+/**
+ * 字符串分组，每digit位字符拆分一次字符串，英文算一个字符，中文算两个字符
+ *
+ * @param digit 位
+ * @return 拆分后的字符串
+ */
+/*
+举例：
+    "你好啊1234567890".groupDouble(3).forEach {
+        println(it.toString())
+    }
+结果：
+    你
+    好
+    啊1
+    234
+    567
+    890
+*/
+fun String.groupDouble(digit: Int): List<StringBuilder> {
+    if (this.length < digit / 2) {
+        val strings: MutableList<StringBuilder> = ArrayList()
+        strings.add(StringBuilder(this))
+        return strings
+    }
+    val strings: MutableList<StringBuilder> = ArrayList()
+    var sb = StringBuilder()
+    var index = 0
+    var i = 0
+    while (i < this.length) {
+        val c = this[i] //获取每一个字
+        index = if (c.code in 1..127) index + 1 else index + 2
+        if (index > digit) { //如果大于就换行
+            index = 0
+            strings.add(sb)
+            sb = StringBuilder()
+            continue
+        }
+        sb.append(c)
+        if (index >= digit) { //如果大于2倍就换行
+            index = 0
+            strings.add(sb)
+            sb = StringBuilder()
+        }
+        i++
+    }
+    if (sb.isNotEmpty()) strings.add(sb)
+    return strings
+}
+
+
+/**
+ * 字符串分组，每digit位字符拆分一次字符串，英文算一个字符，中文根据字符串编码算个字符
+ *
+ * @param digit 位
+ * @return 拆分后的字符串
+ */
+/*
+举例：
+    "你好啊1234567890".groupActual(3).forEach {
+        println(it.toString())
+    }
+结果：
+    你
+    好
+    啊
+    123
+    456
+    789
+    0
+*/
+fun String.groupActual(digit: Int, charset: Charset? = Charset.defaultCharset()): List<StringBuilder> {
+    if (digit < 3) return this.group(digit)
+    if (this.length < digit / 3) {
+        val strings: MutableList<StringBuilder> = ArrayList()
+        strings.add(StringBuilder(this))
+        return strings
+    }
+    val strings: MutableList<StringBuilder> = ArrayList()
+    var sb = StringBuilder()
+    var index = 0
+    val length = this.length
+    var i = 0
+    while (i < length) {
+        val c = this[i] //获取每一个字
+        index += c.toString().toByteArray(charset ?: Charset.defaultCharset()).size
+        //如果大于就换行
+        if (index > digit) {
+            index = 0
+            strings.add(sb)
+            sb = StringBuilder()
+            continue
+        }
+        //连接字符串
+        sb.append(c)
+        if (index == digit) { //如果大于就换行
+            index = 0
+            strings.add(sb)
+            sb = StringBuilder()
+        }
+        i++
+    }
+    if (sb.isNotEmpty()) strings.add(sb)
+    return strings
+}
+
+/**
+ * 字符串每隔digit位添加一个符号
+ * @param digit        每隔digit位添加一个符号
+ * @param insertString 添加的符号
+ * @return 结果
+ */
+/*
+* 举例：println("你好啊1234567890".insert(3,"⊙"))
+* 结果：你好啊⊙123⊙456⊙789⊙0
+*/
+fun String.insert(digit: Int, insertString: String): String {
+    val regex = "(.{$digit})"
+    return this.replace(regex.toRegex(), "$1$insertString")
 }

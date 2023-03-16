@@ -15,7 +15,7 @@ fun <T> T.showStackTrace(type: Int = Log.INFO): T {
                 else -> {}
             }
         }
-    }catch (e:Exception){
+    } catch (e: Exception) {
         e.printStackTrace()
     }
     return this
@@ -50,7 +50,7 @@ fun getLine(lineDeviation: Int): String? {
     val targetElement = try {
         stackTrace[1 + lineDeviation]
     } catch (e: ArrayIndexOutOfBoundsException) {
-        """错误！堆栈跟踪偏移行数组越界。 ${e.message}""".trimIndent().logE(t = e)
+        """错误！堆栈跟踪偏移行数组越界。 ${e.message}""".trimIndent().logE("StackTrace", e)
         return null
     }
     val fileName = getJavaFileName(targetElement)

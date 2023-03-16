@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Base64
 import java.io.*
-import java.util.*
 
 /**
  * base64的ByteArray转码返回String
@@ -58,8 +57,9 @@ fun ByteArray.toBitmap(): Bitmap? {
  * ByteArray转换成file并写入储存
  */
 fun ByteArray.toFile(file: File): Boolean {
-    if (!file.parentFile.exists()) // 如果位置不存在
-        file.parentFile?.mkdirs()
+    file.parentFile?.let {
+        if (!it.exists()) it.mkdirs() // 如果位置不存在
+    }
     if (file.exists()) file.delete()
     val out: FileOutputStream
     try {
@@ -68,10 +68,10 @@ fun ByteArray.toFile(file: File): Boolean {
         out.flush()
         out.close()
     } catch (e: FileNotFoundException) {
-        println("No Find File")
+        e.printStackTrace()
         return false
     } catch (e: IOException) {
-        println("IO Error")
+        e.printStackTrace()
         return false
     }
     return true
@@ -82,8 +82,9 @@ fun ByteArray.toFile(file: File): Boolean {
  */
 fun ByteArray.addFile(file: File): Boolean {
     try {
-        if (!file.parentFile.exists()) // 如果位置不存在
-            file.parentFile.mkdirs()
+        file.parentFile?.let {
+            if (!it.exists()) it.mkdirs() // 如果位置不存在
+        }
         // 打开一个随机访问文件流，按读写方式
         val randomFile = RandomAccessFile(file, "rw")
         // 文件长度，字节数
