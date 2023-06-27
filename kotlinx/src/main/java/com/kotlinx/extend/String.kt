@@ -10,8 +10,6 @@ import com.kotlinx.utils.TTS
 import com.kotlinx.utils.ui
 import java.io.File
 import java.nio.charset.Charset
-import java.text.SimpleDateFormat
-import java.util.*
 
 /** 判断是否是Int*/
 /*举例： "123".isInt() */
@@ -274,8 +272,8 @@ var ip: String
     get() = "服务器IP.txt".readPath() ?: "127.0.0.1"
     set(value) = value.writePath("服务器IP.txt" )
  */
-fun String.readPath(): String? {
-    return File(ExternalFile.getDir() + "/" + this).string()
+fun String.readPath(path: String = ExternalFile.getDir().toString()): String? {
+    return File("$path/$this").string()
 }
 
 /**写入文本到外部储存*/
@@ -284,8 +282,8 @@ var port: Int
     get() = "端口.txt".readPath()?.toInt() ?: 8080
     set(value) = value.toString().writePath("端口.txt")
  */
-fun String?.writePath(fileName: String) {
-    (this ?: "").toFile(ExternalFile.getDir() + "/" + fileName)
+fun String?.writePath(fileName: String, path: String = ExternalFile.getDir().toString()) {
+    (this ?: "").toFile("$path/$fileName")
 }
 
 /**将字符串添加到文件*/

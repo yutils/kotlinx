@@ -22,7 +22,7 @@ object ExternalFile {
      * 返回的字符串末尾没有 /
      */
     fun getDir(): String? {
-        return Kotlinx.app?.getExternalFilesDir("")?.absolutePath
+        return Kotlinx.app.getExternalFilesDir("")?.absolutePath
     }
 
     /**外部储存读取文件成String*/

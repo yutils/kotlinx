@@ -29,11 +29,13 @@ class MainActivity : ComponentActivity() {
     companion object {
         var context: Context? = null
     }
-
+    var ip: String
+        get() = "服务器IP.txt".readPath(Kotlinx.app.filesDir.path) ?: "127.0.0.1"
+        set(value) = value.writePath("服务器IP.txt",Kotlinx.app.filesDir?.path?:"" )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         context = this
-        Kotlinx.init(application)
+//        Kotlinx.init(application)
 
         setContent {
             KotlinxTheme {
@@ -47,6 +49,9 @@ class MainActivity : ComponentActivity() {
             if (tag == "StackTrace") return@listener
             if (type == Log.INFO) "${Date().format()}  $tag  $msg\r\n".addFile(File(Kotlinx.app?.getExternalFilesDir("")?.absolutePath + "/log.log"))
         }
+        ip.logI("服务器IP")
+        ip="1111111111"
+        ip.logI("服务器IP")
     }
 }
 
@@ -59,10 +64,7 @@ fun Greeting(name: String) {
     ) {
         Row {
             Text("细雨若静❤！", fontSize = 30.sp)
-            Text("Android开发测试", color = Color.Blue, modifier = Modifier
-                .clickable {}
-                .padding(10.dp))
-        }
+            Text("Android开发测试", color = Color.Blue, modifier = Modifier.clickable {}.padding(10.dp)) }
         Row(
             modifier = Modifier
                 .fillMaxWidth()

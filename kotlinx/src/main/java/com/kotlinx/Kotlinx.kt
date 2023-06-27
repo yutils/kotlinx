@@ -8,7 +8,14 @@ import com.kotlinx.utils.TTS
 object Kotlinx {
     @JvmStatic
     @SuppressLint("StaticFieldLeak")
-    var app: Application? = null
+    var app: Application = Application()
+        get() {
+            if (!isInit) throw RuntimeException("Kotlinx.app未初始化，请调用Kotlinx.init(application)")
+            return field
+        }
+
+    //当前app是否已经初始
+    private var isInit = false
 
     @JvmStatic
     @SuppressLint("StaticFieldLeak")
@@ -17,11 +24,11 @@ object Kotlinx {
     @JvmStatic
     fun init(application: Application) {
         app = application
+        isInit = true
     }
 
     @JvmStatic
     fun destroy() {
-        app = null
         toast = null
         TTS.destroy()
     }
