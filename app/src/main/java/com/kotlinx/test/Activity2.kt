@@ -10,12 +10,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kotlinx.Kotlinx
-import com.kotlinx.extend.toast
 import com.kotlinx.extend.view.BaseViewAdapter
 import com.kotlinx.extend.view.BaseViewHolder
 import com.kotlinx.extend.view.init
-import com.kotlinx.extend.view.show
-import com.kotlinx.test.databinding.TestItemBinding
+import com.kotlinx.extend.view.showEmpty
 
 class Activity2 : Activity() {
 
@@ -47,6 +45,7 @@ class Activity2 : Activity() {
             override fun getView(): View {
                 return rView()
             }
+
             override fun item(holder: BaseViewHolder, position: Int) {
                 val tv = holder.root.findViewWithTag<TextView>("tv")
                 tv.text = list2[position]

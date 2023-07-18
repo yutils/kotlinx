@@ -93,11 +93,53 @@ fun RecyclerView.init(Orientation: Int = RecyclerView.VERTICAL, items: Int? = nu
 /**
  * 显示空的RecyclerView，可以设置提示文字或者 textView
  */
-fun RecyclerView.showEmpty(emptyText: CharSequence? = null, textView: TextView? = null): EmptyAdapter {
+/*
+用法：
+recyclerView.showEmpty("哈哈哈") {
+    it.textSize = 20F
+    it.setTextColor(Color.RED)
+}
+ */
+fun RecyclerView.showEmpty(emptyText: CharSequence = "", listener: ((textView: TextView) -> Unit)? = null): BaseViewAdapter<CharSequence> {
     if (this.layoutManager == null) this.init()
-    val mAdapter = EmptyAdapter(this.context, emptyText, textView)
-    this.adapter = mAdapter
-    return mAdapter
+    val list = arrayListOf(emptyText)
+    val emptyAdapter = object : BaseViewAdapter<CharSequence>(list) {
+        override fun getView(): View {
+            return getEmptyView(context, emptyText)
+        }
+
+        override fun item(holder: BaseViewHolder, position: Int) {
+            val textView = holder.root.findViewWithTag<TextView>("TextView")
+            listener?.invoke(textView)
+        }
+    }
+    this.adapter = emptyAdapter
+    return emptyAdapter
+}
+
+fun getEmptyView(context: Context, mEmptyText: CharSequence? = null): LinearLayout {
+    val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+    layoutParams.gravity = Gravity.CENTER //设置中心对其
+    val linearLayout = LinearLayout(context)
+    linearLayout.layoutParams = layoutParams
+    linearLayout.removeAllViews()
+    linearLayout.orientation = LinearLayout.VERTICAL //设置纵向布局
+    linearLayout.tag = "root"
+    //文字
+    val tvParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+    tvParams.gravity = Gravity.CENTER //TextView在父布局里面居中
+    //实例化一个TextView
+    val tv = TextView(context)
+    tv.layoutParams = tvParams
+    tv.gravity = Gravity.CENTER //文字在TextView里面居中
+    tv.textSize = 25f
+    tv.setTextColor(Color.parseColor("#999999"))
+    tv.tag = "TextView"
+    mEmptyText?.let {
+        tv.text = mEmptyText
+    }
+    linearLayout.addView(tv)
+    return linearLayout
 }
 
 /**
@@ -268,52 +310,6 @@ inline fun RecyclerView.scrollToBetweenTopAndBottomListener(crossinline listener
             }
         }
     })
-}
-
-/**
-空的EmptyHolder
- */
-class EmptyHolder(itemView: View?) : RecyclerView.ViewHolder(itemView!!)
-
-/**
-空的Adapter
- */
-class EmptyAdapter(var context: Context, var mEmptyText: CharSequence? = null, var mTextView: TextView? = null) : RecyclerView.Adapter<EmptyHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmptyHolder {
-        return EmptyHolder(createView())
-    }
-
-    override fun onBindViewHolder(holder: EmptyHolder, position: Int) {}
-
-    override fun getItemCount(): Int = 1
-
-    private fun createView(): LinearLayout {
-        val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
-        layoutParams.gravity = Gravity.CENTER //设置中心对其
-        val linearLayout = LinearLayout(context)
-        linearLayout.layoutParams = layoutParams
-        linearLayout.removeAllViews()
-        linearLayout.orientation = LinearLayout.VERTICAL //设置纵向布局
-        //如果textView优先用传进来的textView
-        mTextView?.let {
-            linearLayout.addView(mTextView)
-            return linearLayout
-        }
-        //文字
-        val tvParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
-        tvParams.gravity = Gravity.CENTER //TextView在父布局里面居中
-        //实例化一个TextView
-        val tv = TextView(context)
-        tv.layoutParams = tvParams
-        tv.gravity = Gravity.CENTER //文字在TextView里面居中
-        tv.textSize = 25f
-        tv.setTextColor(Color.parseColor("#999999"))
-        mEmptyText?.let {
-            tv.text = mEmptyText
-        }
-        linearLayout.addView(tv)
-        return linearLayout
-    }
 }
 
 /**
