@@ -1,6 +1,7 @@
 package com.kotlinx.test
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -35,7 +36,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         context = this
-//        Kotlinx.init(application)
+        Kotlinx.init(application)
 
         setContent {
             KotlinxTheme {
@@ -79,8 +80,9 @@ fun Greeting(name: String) {
 
             Button(onClick = {
                 println("你好".toBase64String()).showStackTrace()
+                MainActivity.context?.startActivity(Intent(MainActivity.context,Activity2::class.java))
             }) {
-                Text("测试2")
+                Text("跳转")
             }
 
             Button(onClick = {

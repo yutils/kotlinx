@@ -1,6 +1,7 @@
 package com.kotlinx
 
-import com.kotlinx.extend.*
+import com.kotlinx.extend.groupActual
+import com.kotlinx.extend.insert
 import org.junit.Test
 
 /**
@@ -12,7 +13,7 @@ class ExampleUnitTest {
     @Test
     fun test() {
 
-        println("你好啊1234567890".insert(3,"⊙"))
+        println("你好啊1234567890".insert(3, "⊙"))
 
         "你好啊1234567890".groupActual(3).forEach {
             println(it.toString())

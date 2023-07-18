@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
  */
 /*
 用法
-val list = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+val list = arrayListOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
 recyclerView.show(R.layout.user_item, list) { holder, position ->
     val binding = holder.binding as UserItemBinding
     val item = list[position]
@@ -346,6 +346,14 @@ class UserAdapter<T>(var data: List<T>) : BaseAdapter<T>(R.layout.user_item, dat
     }
 }
 
+recyclerView.init()
+val adapter = object : BaseAdapter<T>(layout, list) {
+    override fun item(holder: BaseHolder, position: Int) {
+        listener?.invoke(holder, position)
+    }
+}
+recyclerView.adapter = adapter
+
 //或者
 val list :MutableList<String> =ArrayList()
 list.add("A")
@@ -418,5 +426,276 @@ abstract class BaseAdapter<T>(var layout: Int, var list: MutableList<T>?) : Recy
 
     override fun getItemCount(): Int {
         return list?.size ?: 0
+    }
+
+    /**
+     * 更新list
+     */
+    fun update(newList: Iterable<T>) {
+        list?.let {
+            it.clear()
+            for (item in newList) {
+                it.add(item)
+            }
+            notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * 更新一个对象
+     */
+    fun update(obj: T, position: Int) {
+        list?.let {
+            if (position in 0 until it.size) {
+                it[position] = obj
+                notifyDataSetChanged()
+            }
+        }
+    }
+
+    /**
+     * 添加list
+     */
+    fun add(newList: Iterable<T>) {
+        list?.let {
+            it.addAll(newList)
+            notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * 添加一个
+     */
+    fun add(obj: T) {
+        list?.let {
+            it.add(obj)
+            notifyItemInserted(list!!.size - 1)
+        }
+    }
+
+    /**
+     * 添加一个
+     */
+    fun add(obj: T, position: Int) {
+        list?.let {
+            if (position > it.size) return
+            it.add(position, obj)
+            notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * 删除全部对象
+     */
+    fun removeAll() {
+        list?.let {
+            it.clear()
+            notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * 删除一个对象
+     */
+    fun removeAt(position: Int) {
+        list?.let {
+            if (position in 0 until it.size) {
+                it.removeAt(position)
+                //刷新,notifyItemRemoved要配合notifyItemRangeChanged，不然要数组越界
+                notifyItemRemoved(position)
+                notifyItemRangeChanged(position, it.size - position)
+            }
+        }
+    }
+}
+
+
+/*
+用法举例：
+val list2 = arrayListOf("111", "222", "333", "444")
+val myAdapter = object : BaseViewAdapter<String>(list2) {
+    override fun getView(): View {
+        return rView()
+    }
+    override fun item(holder: BaseViewHolder, position: Int) {
+        val tv = holder.root.findViewWithTag<TextView>("tv")
+        tv.text = list2[position]
+    }
+}
+val recyclerView2 = RecyclerView(Kotlinx.app).apply {
+    this.init()
+    this.adapter = myAdapter
+}
+root.addView(recyclerView2)
+
+//创建view
+fun rView(): View {
+    val tv = TextView(this).apply {
+        layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+            setMargins(0, 0, 0, 0)
+            gravity = Gravity.CENTER //设置中心
+        }
+        textSize = 18f
+        setTextColor(Color.parseColor("#EE22EE"))
+        text = "测试"
+        tag = "tv"
+    }
+    val root2 = LinearLayout(this).apply {
+        layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        removeAllViews()
+        orientation = LinearLayout.VERTICAL
+        setPadding(15, 15, 15, 15)
+        tag = "root"
+    }
+    root2.addView(tv)
+    return root2
+}
+
+或者：
+
+
+val list2 = arrayListOf("111", "222", "333", "444")
+class MyAdapter(var data: MutableList<String>) : BaseViewAdapter<String>(data) {
+    override fun getView(): View {
+        return rView()
+    }
+    override fun item(holder: BaseViewHolder, position: Int) {
+        val tv = holder.root.findViewWithTag<TextView>("tv")
+        tv.text = list2[position]
+    }
+}
+val myAdapter=MyAdapter(list2)
+val recyclerView2 = RecyclerView(Kotlinx.app).apply {
+    this.init()
+    this.adapter = myAdapter
+}
+root.addView(recyclerView2)
+
+*/
+
+class BaseViewHolder(var root: View) : RecyclerView.ViewHolder(root)
+
+/**
+ * 不使用布局文件的RecyclerView
+ * @author yujing 2023年7月18日11:36:10
+ */
+abstract class BaseViewAdapter<T>(var list: MutableList<T>?) : RecyclerView.Adapter<BaseViewHolder>() {
+    //recyclerView
+    var recyclerView: RecyclerView? = null
+
+    //单击
+    var onItemClickListener: ((position: Int) -> Unit)? = null
+
+    //长按
+    var onItemLongClickListener: ((position: Int) -> Unit)? = null
+
+    var isSelect: Int = -1
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
+    abstract fun getView(): View
+    abstract fun item(holder: BaseViewHolder, position: Int)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        return BaseViewHolder(getView())
+    }
+
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
+        item(holder, position)
+        //单击
+        onItemClickListener?.let { holder.root.setOnClickListener { onItemClickListener?.invoke(position) } }
+        //长按
+        onItemClickListener?.let { holder.root.setOnLongClickListener { onItemLongClickListener?.invoke(position);false } }
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
+    }
+
+    override fun getItemCount(): Int {
+        return list?.size ?: 0
+    }
+
+    /**
+     * 更新list
+     */
+    fun update(newList: Iterable<T>) {
+        list?.let {
+            it.clear()
+            for (item in newList) {
+                it.add(item)
+            }
+            notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * 更新一个对象
+     */
+    fun update(obj: T, position: Int) {
+        list?.let {
+            if (position in 0 until it.size) {
+                it[position] = obj
+                notifyDataSetChanged()
+            }
+        }
+    }
+
+    /**
+     * 添加list
+     */
+    fun add(newList: Iterable<T>) {
+        list?.let {
+            it.addAll(newList)
+            notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * 添加一个对象
+     */
+    fun add(obj: T) {
+        list?.let {
+            it.add(obj)
+            notifyItemInserted(list!!.size - 1)
+        }
+    }
+
+    /**
+     * 指定位置，添加一个对象
+     */
+    fun add(obj: T, position: Int) {
+        list?.let {
+            if (position > it.size) return
+            it.add(position, obj)
+            notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * 删除全部对象
+     */
+    fun removeAll() {
+        list?.let {
+            it.clear()
+            notifyDataSetChanged()
+        }
+    }
+
+    /**
+     * 删除一个对象
+     */
+    fun removeAt(position: Int) {
+        list?.let {
+            if (position in 0 until it.size) {
+                it.removeAt(position)
+                //刷新,notifyItemRemoved要配合notifyItemRangeChanged，不然要数组越界
+                notifyItemRemoved(position)
+                notifyItemRangeChanged(position, it.size - position)
+            }
+        }
     }
 }
