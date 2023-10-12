@@ -214,7 +214,8 @@ fun String.toastShort(): String {
             toast?.cancel()
             toast = null
         }
-        toast = Toast.makeText(app, string, Toast.LENGTH_SHORT)
+        val value: String? = if (toastfilter != null) toastfilter?.invoke(string) else string
+        toast = Toast.makeText(app, value, Toast.LENGTH_SHORT)
         toast?.show()
     }
     return this
@@ -228,7 +229,8 @@ fun String.toastLong(): String {
             toast?.cancel()
             toast = null
         }
-        toast = Toast.makeText(app, string, Toast.LENGTH_LONG)
+        val value: String? = if (toastfilter != null) toastfilter?.invoke(string) else string
+        toast = Toast.makeText(app, value, Toast.LENGTH_LONG)
         toast?.show()
     }
     return this

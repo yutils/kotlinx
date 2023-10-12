@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
             if (type == Log.INFO) "${Date().format()}  $tag  $msg\r\n".addFile(File(Kotlinx.app?.getExternalFilesDir("")?.absolutePath + "/log.log"))
         }
         ip.logI("服务器IP")
-        ip="1111111111"
+        ip="192.168.1.109"
         ip.logI("服务器IP")
     }
 }

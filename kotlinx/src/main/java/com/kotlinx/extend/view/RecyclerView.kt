@@ -74,19 +74,19 @@ fun <T> RecyclerView.removeAt(position: Int): RecyclerView {
 用法：
 binding.rv.init()
  */
-fun RecyclerView.init(Orientation: Int = RecyclerView.VERTICAL, items: Int? = null) {
+fun RecyclerView.init(orientation: Int = RecyclerView.VERTICAL, items: Int? = null) {
     //单行/单列
     if (items == null) {
         val layoutManager = LinearLayoutManager(context)
         layoutManager.isSmoothScrollbarEnabled = true
-        layoutManager.orientation = Orientation
+        layoutManager.orientation = orientation
         this.layoutManager = layoutManager
         return
     }
     //多行多列
     val layoutManager = GridLayoutManager(context, items)
     layoutManager.isSmoothScrollbarEnabled = true
-    layoutManager.orientation = Orientation
+    layoutManager.orientation = orientation
     this.layoutManager = layoutManager
 }
 
@@ -393,6 +393,9 @@ abstract class BaseAdapter<T>(var layout: Int, var list: MutableList<T>?) : Recy
     //长按
     var onItemLongClickListener: ((position: Int) -> Unit)? = null
 
+    //创建ViewHolder完成
+    var onCreateViewHolderListener: ((baseHolder: BaseHolder) -> Unit)? = null
+
     var isSelect: Int = -1
         set(value) {
             field = value
@@ -400,7 +403,9 @@ abstract class BaseAdapter<T>(var layout: Int, var list: MutableList<T>?) : Recy
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder {
-        return BaseHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), layout, parent, false))
+        val baseHolder = return BaseHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), layout, parent, false))
+        onCreateViewHolderListener?.invoke(baseHolder)
+        return baseHolder
     }
 
     abstract fun item(holder: BaseHolder, position: Int)

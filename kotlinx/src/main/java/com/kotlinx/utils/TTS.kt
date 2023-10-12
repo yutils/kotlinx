@@ -97,7 +97,7 @@ object TTS {
     @JvmStatic
     fun speak(str: String?) {
         if (initState == -1) return init(Kotlinx.app) { if (it) speak(str) }
-        if (initState != 0 || str == null || str.isEmpty() || textToSpeech == null) return
+        if (initState != 0 || str.isNullOrEmpty() || textToSpeech == null) return
         val speak: String? = if (filter != null) filter?.invoke(str) else str
         if (speak.isNullOrEmpty()) return
         textToSpeech?.setSpeechRate(speechRate) //速度
@@ -177,7 +177,7 @@ object TTS {
     @JvmStatic
     fun speakQueue(str: String?) {
         if (initState == -1) return init(Kotlinx.app) { if (it) speakQueue(str) }
-        if (initState != 0 || str == null || str.isEmpty() || textToSpeech == null) return
+        if (initState != 0 || str.isNullOrEmpty() || textToSpeech == null) return
         val speak: String? = if (filter != null) filter?.invoke(str) else str
         if (speak.isNullOrEmpty()) return
         textToSpeech?.setSpeechRate(speechRate) //速度
