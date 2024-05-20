@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
  */
 /*
 用法
-val list = mutableListOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
-adapter = recyclerView.show(R.layout.user_item, list) { holder, position ->
+val dataList = mutableListOf("1", "2", "3", "4", "5", "6")
+adapter = recyclerView.show(R.layout.user_item, dataList) { holder, position ->
     val binding = holder.binding as UserItemBinding
     val item = list[position]
 }
@@ -19,7 +19,7 @@ adapter.onItemClickListener = { position ->
     "第${position}行被点击了".toast()
 }
  */
-fun <T> RecyclerView.show(layout: Int, list: MutableList<T>, listener: ((holder: BaseHolder, position: Int) -> Unit)? = null): BaseAdapter<T> {
+fun <T> RecyclerView.show(layout: Int, list: MutableList<T> = mutableListOf(), listener: ((holder: BaseHolder, position: Int) -> Unit)? = null): BaseAdapter<T> {
     if (this.layoutManager == null) this.init()
     val adapter = object : BaseAdapter<T>(layout, list) {
         override fun item(holder: BaseHolder, position: Int) {
@@ -28,122 +28,6 @@ fun <T> RecyclerView.show(layout: Int, list: MutableList<T>, listener: ((holder:
     }
     this.adapter = adapter
     return adapter
-}
-
-//获取数据列表
-fun <T> RecyclerView.getMutableList(): MutableList<T>? {
-    this.adapter?.let { adapter ->
-        if (adapter is BaseAdapter<*>) {
-            adapter as BaseAdapter<T>
-            return adapter.list
-        } else if (adapter is BaseViewAdapter<*>) {
-            adapter as BaseViewAdapter<T>
-            return adapter.list
-        } else {
-            //其他适配器不支持
-        }
-    }
-    return null
-}
-
-//添加一条数据
-fun <T> RecyclerView.addItem(item: T): RecyclerView {
-    this.adapter?.let { adapter ->
-        if (adapter is BaseAdapter<*>) {
-            adapter as BaseAdapter<T>
-            adapter.add(item)
-            adapter.list?.let { list ->
-                scrollToPosition(list.size - 1)
-            }
-        } else if (adapter is BaseViewAdapter<*>) {
-            adapter as BaseViewAdapter<T>
-            adapter.add(item)
-            adapter.list?.let { list ->
-                scrollToPosition(list.size - 1)
-            }
-        } else {
-            //其他适配器不支持
-        }
-    }
-    return this
-}
-
-//添加一组数据
-fun <T> RecyclerView.addItem(items: Iterable<T>): RecyclerView {
-    this.adapter?.let { adapter ->
-        if (adapter is BaseAdapter<*>) {
-            adapter as BaseAdapter<T>
-            adapter.add(items)
-            adapter.list?.let { list ->
-                scrollToPosition(list.size - 1)
-            }
-        } else if (adapter is BaseViewAdapter<*>) {
-            adapter as BaseViewAdapter<T>
-            adapter.add(items)
-            adapter.list?.let { list ->
-                scrollToPosition(list.size - 1)
-            }
-        } else {
-            //其他适配器不支持
-        }
-    }
-    return this
-}
-
-//更新数据
-fun <T> RecyclerView.update(items: Iterable<T>): RecyclerView {
-    this.adapter?.let { adapter ->
-        if (adapter is BaseAdapter<*>) {
-            adapter as BaseAdapter<T>
-            adapter.update(items)
-        } else if (adapter is BaseViewAdapter<*>) {
-            adapter as BaseViewAdapter<T>
-            adapter.update(items)
-        } else {
-            //其他适配器不支持
-        }
-    }
-    return this
-}
-
-//删除一条数据
-fun RecyclerView.removeAt(position: Int): RecyclerView {
-    this.adapter?.let { adapter ->
-        if (adapter is BaseAdapter<*>) {
-            adapter.removeAt(position)
-        } else if (adapter is BaseViewAdapter<*>) {
-            adapter.removeAt(position)
-        }
-    }
-    return this
-}
-
-/**
- * 清空RecyclerView，在RecyclerView中放入一个空布局
- */
-/*
-也可以创建一个空的Adapter
-if (this.layoutManager == null) this.init()
-class ClearAdapter(var context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        class Holder : RecyclerView.ViewHolder(View(context))
-        return Holder()
-    }
-    override fun getItemCount(): Int = 0
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-    }
-}
-this.adapter = ClearAdapter(context)
- */
-fun RecyclerView.clear(): RecyclerView {
-    this.adapter?.let { adapter ->
-        if (adapter is BaseAdapter<*>) {
-            adapter.removeAll()
-        } else if (adapter is BaseViewAdapter<*>) {
-            adapter.removeAll()
-        }
-    }
-    return this
 }
 
 /**
@@ -183,7 +67,7 @@ recyclerView.showEmpty("暂无数据") {
 fun RecyclerView.showEmpty(mEmptyText: CharSequence = "暂无数据", listener: ((textView: TextView) -> Unit)? = null): BaseViewAdapter<CharSequence> {
     if (this.layoutManager == null) this.init()
     val adapter = BottomAdapter(context, mEmptyText, listener)
-    adapter.matchParent()
+    adapter.showMatchParent()
     this.adapter = adapter
     return adapter
 }

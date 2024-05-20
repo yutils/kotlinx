@@ -86,3 +86,16 @@ fun io(runnable: Runnable) {
 fun io(block: suspend CoroutineScope.() -> Unit) {
     CoroutineScope(Dispatchers.IO).launch { withContext(Dispatchers.IO, block) }
 }
+
+/**
+ * 防抖延迟，默认每200毫秒，最多执行一次
+ */
+val debounceMap = HashMap<String, Long>()
+fun debounce(millis: Long = 200, listener: () -> Unit) {
+    val lastTime = debounceMap[listener.javaClass.name] ?: 0L
+    val currentTime = System.currentTimeMillis()
+    if (currentTime - lastTime >= millis) {
+        listener.invoke()
+        debounceMap[listener.javaClass.name] = currentTime
+    }
+}

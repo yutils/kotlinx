@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import com.kotlinx.extend.addAndReplace
+import com.kotlinx.utils.debounce
 
 
 /**
@@ -86,6 +88,9 @@ abstract class BaseAdapter<T>(val layout: Int, val list: MutableList<T> = mutabl
     //数据改变监听
     var dataChangeListener: ((list: MutableList<T>) -> Unit)? = null
 
+    //防抖延迟，毫秒，默认200毫秒
+    var debounceMillis: Long = 200
+
     var isSelect: Int = -1
         set(value) {
             notifyItemRangeChanged(field, list.size)
@@ -94,7 +99,7 @@ abstract class BaseAdapter<T>(val layout: Int, val list: MutableList<T> = mutabl
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder {
-        val baseHolder = return BaseHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), layout, parent, false))
+        val baseHolder = BaseHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), layout, parent, false))
         onCreateViewHolderListener?.invoke(baseHolder)
         return baseHolder
     }
@@ -104,7 +109,7 @@ abstract class BaseAdapter<T>(val layout: Int, val list: MutableList<T> = mutabl
     override fun onBindViewHolder(holder: BaseHolder, position: Int) {
         item(holder, position)
         //单击
-        onItemClickListener?.let { holder.binding.root.setOnClickListener { onItemClickListener?.invoke(position) } }
+        onItemClickListener?.let { holder.binding.root.setOnClickListener { debounce(debounceMillis) { onItemClickListener?.invoke(position) } } }
         //长按
         onItemClickListener?.let { holder.binding.root.setOnLongClickListener { onItemLongClickListener?.invoke(position);false } }
         //必须要有这行，防止闪烁
@@ -148,22 +153,12 @@ abstract class BaseAdapter<T>(val layout: Int, val list: MutableList<T> = mutabl
     }
 
     /**
-     * 添加list
-     */
-    fun add(newList: Iterable<T>) {
-        list.addAll(newList)
-        notifyDataSetChanged()
-        dataChangeListener?.invoke(list)
-    }
-
-    /**
      * 添加一个
      */
     fun add(obj: T) {
         list.add(obj)
         notifyItemInserted(list.size - 1)
         dataChangeListener?.invoke(list)
-
     }
 
     /**
@@ -178,13 +173,21 @@ abstract class BaseAdapter<T>(val layout: Int, val list: MutableList<T> = mutabl
     }
 
     /**
-     * 删除全部对象
+     * 添加list，如果他们条件满足，覆盖（如果id相同）。如果不存在条件满足的项，添加。
      */
-    fun removeAll() {
-        list.clear()
+    /*
+        adapter.add(list) { oldItem, newItem ->
+            oldItem.id == newItem.id
+        }
+     */
+    fun add(newList: Iterable<T>, identical: ((T, T) -> Boolean)? = null) {
+        if (identical != null) {
+            list.addAndReplace(newList, identical)
+        } else {
+            list.addAll(newList)
+        }
         notifyDataSetChanged()
         dataChangeListener?.invoke(list)
-
     }
 
     /**
@@ -198,5 +201,21 @@ abstract class BaseAdapter<T>(val layout: Int, val list: MutableList<T> = mutabl
             notifyItemRangeChanged(position, list.size - position)
             dataChangeListener?.invoke(list)
         }
+    }
+
+    /**
+     * 删除全部对象
+     */
+    fun removeAll() {
+        clear()
+    }
+
+    /**
+     * 删除全部对象
+     */
+    fun clear() {
+        list.clear()
+        notifyDataSetChanged()
+        dataChangeListener?.invoke(list)
     }
 }

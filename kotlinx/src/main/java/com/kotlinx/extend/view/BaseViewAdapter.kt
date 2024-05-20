@@ -3,6 +3,8 @@ package com.kotlinx.extend.view
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.kotlinx.extend.addAndReplace
+import com.kotlinx.utils.debounce
 
 /*
 简单使用：
@@ -79,6 +81,9 @@ abstract class BaseViewAdapter<T>(val list: MutableList<T> = mutableListOf()) : 
     //数据改变监听
     var dataChangeListener: ((list: MutableList<T>) -> Unit)? = null
 
+    //防抖延迟，毫秒，默认200毫秒
+    var debounceMillis: Long = 200
+
     var isSelect: Int = -1
         set(value) {
             notifyItemRangeChanged(field, list.size)
@@ -96,7 +101,7 @@ abstract class BaseViewAdapter<T>(val list: MutableList<T> = mutableListOf()) : 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         item(holder, position)
         //单击
-        onItemClickListener?.let { holder.root.setOnClickListener { onItemClickListener?.invoke(position) } }
+        onItemClickListener?.let { holder.root.setOnClickListener { debounce(debounceMillis) { onItemClickListener?.invoke(position) } } }
         //长按
         onItemClickListener?.let { holder.root.setOnLongClickListener { onItemLongClickListener?.invoke(position);false } }
     }
@@ -139,13 +144,21 @@ abstract class BaseViewAdapter<T>(val list: MutableList<T> = mutableListOf()) : 
     }
 
     /**
-     * 添加list
+     * 添加list，如果他们条件满足，覆盖（如果id相同）。如果不存在条件满足的项，添加。
      */
-    fun add(newList: Iterable<T>) {
-        list.addAll(newList)
+    /*
+        adapter.add(list) { oldItem, newItem ->
+            oldItem.id == newItem.id
+        }
+     */
+    fun add(newList: Iterable<T>, identical: ((T, T) -> Boolean)? = null) {
+        if (identical != null) {
+            list.addAndReplace(newList, identical)
+        } else {
+            list.addAll(newList)
+        }
         notifyDataSetChanged()
         dataChangeListener?.invoke(list)
-
     }
 
     /**
@@ -168,15 +181,6 @@ abstract class BaseViewAdapter<T>(val list: MutableList<T> = mutableListOf()) : 
     }
 
     /**
-     * 删除全部对象
-     */
-    fun removeAll() {
-        list.clear()
-        notifyDataSetChanged()
-        dataChangeListener?.invoke(list)
-    }
-
-    /**
      * 删除一个对象
      */
     fun removeAt(position: Int) {
@@ -188,5 +192,21 @@ abstract class BaseViewAdapter<T>(val list: MutableList<T> = mutableListOf()) : 
             dataChangeListener?.invoke(list)
         }
 
+    }
+
+    /**
+     * 删除全部对象
+     */
+    fun removeAll() {
+        clear()
+    }
+
+    /**
+     * 删除全部对象
+     */
+    fun clear() {
+        list.clear()
+        notifyDataSetChanged()
+        dataChangeListener?.invoke(list)
     }
 }

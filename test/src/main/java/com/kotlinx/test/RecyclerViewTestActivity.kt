@@ -40,20 +40,13 @@ class RecyclerViewTestActivity : Activity() {
         }
 
         val bottomAdapter = BottomAdapter(this, "没有更多数据")
-        bottomAdapter.matchParent()
+        bottomAdapter.showMatchParent()
         val config = ConcatAdapter.Config.Builder().setIsolateViewTypes(true).build()
         val concatAdapter = ConcatAdapter(config, myAdapter, bottomAdapter)
 
         myAdapter.dataChangeListener = {
-            if (it.size == 0) { //列表为空
-                bottomAdapter.matchParent("暂无数据")
-            } else {
-                if (it.size > 20) {//模拟，已经是最后一页
-                    bottomAdapter.wrapContent("没有更多数据")
-                } else {
-                    bottomAdapter.hide()
-                }
-            }
+            if (it.size == 0) bottomAdapter.showMatchParent("暂无数据")
+            else bottomAdapter.showWrapContent("没有更多数据")
         }
 
         val rootView = LinearLayout(this).apply {
@@ -86,27 +79,28 @@ class RecyclerViewTestActivity : Activity() {
                 addView(Button(context).apply {
                     text = "添加"
                     setOnClickListener {
+
 //                    myAdapter.add("003")
 //                    myAdapter.add("002")
 //                    myAdapter.add("001")
                         val list = arrayListOf("添加1", "添加2", "添加3", "添加4", "添加5")
-                        myAdapter.add(list)
-//                        rv.addItem(list)
+                        //添加且去重复
+                        myAdapter.add(list) { oldItem, newItem ->
+                            oldItem == "添加1"
+                        }
                     }
                 })
+
                 addView(Button(context).apply {
                     text = "更新"
                     setOnClickListener {
                         val list = arrayListOf("111", "222", "333", "444", "555", "666", "777", "888")
                         myAdapter.update(list)
-//                    myAdapter.update("00000", 3)
-//                    rv.update(list)
                     }
                 })
                 addView(Button(this@RecyclerViewTestActivity).apply {
                     text = "删除"
                     setOnClickListener {
-//                    rv.removeAt(3)
                         myAdapter.removeAt(3)
                         myAdapter.removeAt(5)
                     }
@@ -115,7 +109,6 @@ class RecyclerViewTestActivity : Activity() {
                     text = "删完"
                     setOnClickListener {
                         myAdapter.removeAll()
-//                    rv.clear()
                     }
                 })
             }
@@ -130,7 +123,7 @@ class RecyclerViewTestActivity : Activity() {
     fun rView(): View {
         val tv = TextView(this).apply {
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
-                setMargins(0, 0, 0, 0)
+                setMargins(0, 8, 0, 8)
                 gravity = Gravity.CENTER //设置中心
             }
             textSize = 18f

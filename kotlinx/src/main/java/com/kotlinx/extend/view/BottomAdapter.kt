@@ -20,17 +20,19 @@ var bottomAdapter = BottomAdapter(this, "没有更多数据")
 val config = ConcatAdapter.Config.Builder().setIsolateViewTypes(true).build()
 val concatAdapter = ConcatAdapter(config, myAdapter, bottomAdapter)
 
-myAdapter.dataChangeListener = {
-    if (it.size == 0) { //列表为空
-        bottomAdapter.matchParent("暂无数据")
-    } else {
-        if (it.size > 20) {//模拟，已经是最后一页
-            bottomAdapter.wrapContent("没有更多数据")
-        } else {
-            bottomAdapter.hide()
-        }
-    }
+//分页，网络请求后判断
+when {
+    value.totalSize == 0 -> bottomAdapter.showMatchParent("暂无数据")
+    pageNum * pageSize >= value.totalSize -> bottomAdapter.showWrapContent("没有更多数据")
+    pageNum * pageSize < value.totalSize -> bottomAdapter.showWrapContent("正在加载...")
 }
+
+//非分页，数据改变后判断
+myAdapter.dataChangeListener = {
+    if (it.size == 0) bottomAdapter.showMatchParent("暂无数据")
+    else bottomAdapter.showWrapContent("没有更多数据")
+}
+
  */
 class BottomAdapter(val context: Context, var tips: CharSequence = "没有更多数据", var listener: ((textView: TextView) -> Unit)? = null) : BaseViewAdapter<CharSequence>(mutableListOf(tips)) {
     private var height = LinearLayout.LayoutParams.WRAP_CONTENT
@@ -50,8 +52,9 @@ class BottomAdapter(val context: Context, var tips: CharSequence = "没有更多
         listener?.invoke(textView)
     }
 
-    fun wrapContent(content: CharSequence? = null) {
-        show()
+    fun showWrapContent(content: CharSequence? = null) {
+        isShow = true
+        holder?.root?.isVisible = isShow
         height = LinearLayout.LayoutParams.WRAP_CONTENT
         holder?.root?.findViewWithTag<LinearLayout>("root")?.let {
             it.layoutParams.height = height
@@ -62,25 +65,25 @@ class BottomAdapter(val context: Context, var tips: CharSequence = "没有更多
         }
     }
 
-    fun matchParent(content: CharSequence? = null) {
-        show()
+    fun showMatchParent(content: CharSequence? = null) {
+        isShow = true
+        holder?.root?.isVisible = isShow
         height = LinearLayout.LayoutParams.MATCH_PARENT
         holder?.root?.findViewWithTag<LinearLayout>("root")?.let {
             it.layoutParams.height = height
             it.gravity = Gravity.CENTER
         }
         tips = buildSpannedString {
-            scale(1.6F) { append(content ?: tips) }
+            scale(2F) { append(content ?: tips) }
         }
     }
 
     fun hide() {
         isShow = false
-        holder?.root?.isVisible = isShow
-    }
-
-    fun show() {
-        isShow = true
+        height = LinearLayout.LayoutParams.WRAP_CONTENT
+        holder?.root?.findViewWithTag<LinearLayout>("root")?.let {
+            it.layoutParams.height = 0
+        }
         holder?.root?.isVisible = isShow
     }
 
