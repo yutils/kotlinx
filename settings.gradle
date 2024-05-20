@@ -9,10 +9,10 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
-        //mavenCentral()
-        maven { url 'http://maven.kotlinx.com:8081/repository/maven-public'; allowInsecureProtocol = true }
+        mavenCentral()
+        //maven { url 'http://maven.kotlinx.com:8081/repository/maven-public'; allowInsecureProtocol = true }
     }
 }
 rootProject.name = "kotlinx"
-include ':app'
+include ':test'
 include ':kotlinx'

@@ -80,7 +80,7 @@ fun Greeting(name: String) {
 
             Button(onClick = {
                 println("你好".toBase64String()).showStackTrace()
-                MainActivity.context?.startActivity(Intent(MainActivity.context,Activity2::class.java))
+                MainActivity.context?.startActivity(Intent(MainActivity.context,RecyclerViewTestActivity::class.java))
             }) {
                 Text("跳转")
             }
