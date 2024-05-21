@@ -26,8 +26,8 @@ class BaseHolder(var binding: ViewDataBinding) : RecyclerView.ViewHolder(binding
 用法举例：
 
 //简单使用
-val list = mutableListOf("A","B","C")
-val adapter = object : BaseAdapter<String>(R.layout.user_item, list) {
+val dataList = mutableListOf("A","B","C")
+val adapter = object : BaseAdapter<String>(R.layout.user_item, dataList) {
     override fun item(holder: BaseHolder, position: Int) {
         val binding = holder.binding as UserItemBinding
         val item = list[position]
@@ -35,6 +35,11 @@ val adapter = object : BaseAdapter<String>(R.layout.user_item, list) {
         binding.iv.setOnClickListener { ("点击图片：" + item).toast() }
     }
 }
+adapter.onItemClickListener = { position ->
+    val item = adapter.list[position]
+}
+recyclerView.adapter = adapter
+
 
 //继承使用
 recyclerView.init()
@@ -46,7 +51,6 @@ class UserAdapter(var data: MutableList<User>) : BaseAdapter<User>(R.layout.user
         binding.iv.setOnClickListener { ("点击：" + item.name).toast() }
     }
 }
-
 recyclerView.adapter = UserAdapter(list)
 
 
@@ -69,6 +73,83 @@ class CarAdapter<T>(var list: List<T>?) : RecyclerView.Adapter<MyViewHolder>() {
     }
 }
  */
+
+
+
+//region 下拉刷新，上拉加载完整演示
+/*
+var page: Int = 1
+var pageSize: Int = 20
+var adapter: BaseAdapter<User>? = null
+var bottomAdapter = BottomAdapter(this, "正在加载...")
+var oldData: ResponsePage<User>? = null //最后一次请求数据
+
+override fun onCreate() {
+    ...
+    //初始化Adapter
+    initAdapter()
+    binding.run {
+        //下拉刷新
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_green_dark, android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light)
+        swipeRefreshLayout.setOnRefreshListener {
+            binding.swipeRefreshLayout.isRefreshing = false
+            page = 1
+            adapter?.removeAll()
+            网络请求(page, pageSize){value - > net(value)}
+        }
+        //上拉加载
+        recyclerView.toBottomListener {
+            oldData?.let {
+                if (page * pageSize >= it.totalSize) return@let
+                page++
+                网络请求(page, pageSize){value - > net(value)}
+            }
+        }
+    }
+    网络请求(page, pageSize){value - > net(value)}
+}
+
+//初始化Adapter
+fun initAdapter() {
+    binding.rv.init()
+    adapter = object : BaseAdapter<User>(R.layout.activity_user_item) {
+        override fun item(holder: BaseHolder, position: Int) {
+            val binding = holder.binding as ActivityUserItemBinding
+            val item = list[position]
+            binding.run {
+                tvName.text = item.realName
+                tvPhone.text = item.phone
+            }
+        }
+    }
+    //点击
+    adapter?.onItemClickListener = { position ->
+        adapter?.list?.get(position).let { item ->
+        }
+    }
+    val config = ConcatAdapter.Config.Builder().setIsolateViewTypes(true).build()
+    val concatAdapter = ConcatAdapter(config, adapter, bottomAdapter)
+    binding.recyclerView.adapter = concatAdapter
+}
+
+//网络请求结果回调
+fun net(value: ResponsePage<User>) {
+    this.oldData = value
+    when {
+        value.totalSize == 0 -> bottomAdapter.showMatchParent("暂无数据")
+        page * pageSize >= value.totalSize -> bottomAdapter.showWrapContent("没有更多数据")
+        page * pageSize < value.totalSize -> bottomAdapter.showWrapContent("正在加载...")
+    }
+    if (page == 1) adapter?.list?.clear()
+    //如果id相同，覆盖。如果不存在，添加。
+    adapter?.add(value.objs) { oldItem, newItem ->
+        oldItem.id == newItem.id
+    }
+}
+
+ */
+//endregion
+
 abstract class BaseAdapter<T>(val layout: Int, val list: MutableList<T> = mutableListOf()) : RecyclerView.Adapter<BaseHolder>() {
     //recyclerView
     var recyclerView: RecyclerView? = null

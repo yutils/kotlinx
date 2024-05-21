@@ -16,7 +16,7 @@ import androidx.core.view.isVisible
  */
 /*
 举例:
-var bottomAdapter = BottomAdapter(this, "没有更多数据")
+var bottomAdapter = BottomAdapter(this, "正在加载...")
 val config = ConcatAdapter.Config.Builder().setIsolateViewTypes(true).build()
 val concatAdapter = ConcatAdapter(config, myAdapter, bottomAdapter)
 

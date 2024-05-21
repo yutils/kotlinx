@@ -10,14 +10,33 @@ import androidx.recyclerview.widget.RecyclerView
  */
 /*
 用法
-val dataList = mutableListOf("1", "2", "3", "4", "5", "6")
-adapter = recyclerView.show(R.layout.user_item, dataList) { holder, position ->
+val list = mutableListOf("1", "2", "3", "4", "5", "6")
+adapter = recyclerView.show(R.layout.user_item, list) { holder, position ->
     val binding = holder.binding as UserItemBinding
     val item = list[position]
 }
 adapter.onItemClickListener = { position ->
     "第${position}行被点击了".toast()
 }
+
+或直接使用BaseAdapter
+var adapter: BaseAdapter<String>? = null
+private fun initRecyclerView(){
+    recyclerView.init()
+    adapter = object : BaseAdapter<String>(R.layout.user_item) {
+        override fun item(holder: BaseHolder, position: Int) {
+            val binding = holder.binding as UserItemBinding
+            val item = list[position]
+            binding.tvName.text = item
+            binding.iv.setOnClickListener { ("点击图片：" + item).toast() }
+        }
+    }
+    adapter?.onItemClickListener = { position ->
+        val item = adapter.list[position]
+    }
+    recyclerView.adapter = adapter
+}
+adapter?.add(mutableListOf("1", "2", "3"))
  */
 fun <T> RecyclerView.show(layout: Int, list: MutableList<T> = mutableListOf(), listener: ((holder: BaseHolder, position: Int) -> Unit)? = null): BaseAdapter<T> {
     if (this.layoutManager == null) this.init()
