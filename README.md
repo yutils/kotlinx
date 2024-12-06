@@ -7,10 +7,10 @@
 # 希望更多小伙伴加入和我一起扩充
 
 [![platform](https://img.shields.io/badge/platform-Android-lightgrey.svg)](https://developer.android.google.cn/studio/index.html)
-![Gradle](https://img.shields.io/badge/Gradle-7.6-brightgreen.svg)
+![Gradle](https://img.shields.io/badge/Gradle-8.11.1-brightgreen.svg)
 [![last commit](https://img.shields.io/github/last-commit/yutils/kotlinx.svg)](https://github.com/yutils/kotlinx/commits/master)
 ![repo size](https://img.shields.io/github/repo-size/yutils/kotlinx.svg)
-![android studio](https://img.shields.io/badge/android%20studio-2022.1.1-green.svg)
+![android studio](https://img.shields.io/badge/android%20studio-2024.3-green.svg)
 [![maven](https://img.shields.io/badge/maven-address-green.svg)](https://search.maven.org/artifact/com.kotlinx/kotlinx)
 
 ## 已经从jitpack.io仓库移动至maven中央仓库
