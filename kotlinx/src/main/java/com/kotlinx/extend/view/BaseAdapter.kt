@@ -75,7 +75,6 @@ class CarAdapter<T>(var list: List<T>?) : RecyclerView.Adapter<MyViewHolder>() {
  */
 
 
-
 //region 下拉刷新，上拉加载完整演示
 /*
 var page: Int = 1
@@ -190,7 +189,7 @@ abstract class BaseAdapter<T>(val layout: Int, val list: MutableList<T> = mutabl
     override fun onBindViewHolder(holder: BaseHolder, position: Int) {
         item(holder, position)
         //单击
-        onItemClickListener?.let { holder.binding.root.setOnClickListener { debounce(debounceMillis) { onItemClickListener?.invoke(position) } } }
+        onItemClickListener?.let { holder.binding.root.setOnClickListener { debounce(millis = debounceMillis) { onItemClickListener?.invoke(position) } } }
         //长按
         onItemClickListener?.let { holder.binding.root.setOnLongClickListener { onItemLongClickListener?.invoke(position);false } }
         //必须要有这行，防止闪烁

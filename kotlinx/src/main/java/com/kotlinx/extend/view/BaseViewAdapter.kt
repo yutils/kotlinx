@@ -101,7 +101,7 @@ abstract class BaseViewAdapter<T>(val list: MutableList<T> = mutableListOf()) : 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         item(holder, position)
         //单击
-        onItemClickListener?.let { holder.root.setOnClickListener { debounce(debounceMillis) { onItemClickListener?.invoke(position) } } }
+        onItemClickListener?.let { holder.root.setOnClickListener { debounce(millis = debounceMillis) { onItemClickListener?.invoke(position) } } }
         //长按
         onItemClickListener?.let { holder.root.setOnLongClickListener { onItemLongClickListener?.invoke(position);false } }
     }

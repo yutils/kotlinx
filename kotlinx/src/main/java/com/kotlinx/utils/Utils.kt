@@ -21,8 +21,9 @@ object ExternalFile {
     /**实际目录:Android/data/包名/files/
      * 返回的字符串末尾没有 /
      */
-    fun getDir(): String? {
+    fun getDir(): String {
         return Kotlinx.app.getExternalFilesDir("")?.absolutePath
+            ?: throw IllegalStateException("无法访问外部文件目录")
     }
 
     /**外部储存读取文件成String*/
@@ -32,7 +33,7 @@ object ExternalFile {
         set(value) = ExternalFile.writeFile(value, "服务器IP.txt")
     */
     fun readFile(fileName: String): String? {
-        return File(getDir() + "/" + fileName).string()
+        return File(getDir(), fileName).string()
     }
 
     /**写入文本到外部储存*/
@@ -49,7 +50,7 @@ object ExternalFile {
 /**
  * 主线程Handler
  */
-val mainHandler: Handler = lazy { Handler(Looper.getMainLooper()) }.value
+val mainHandler: Handler by lazy { Handler(Looper.getMainLooper()) }
 
 /**
  * 判断是否在UI线程
@@ -90,12 +91,14 @@ fun io(block: suspend CoroutineScope.() -> Unit) {
 /**
  * 防抖延迟，默认每200毫秒，最多执行一次
  */
-val debounceMap = HashMap<String, Long>()
-fun debounce(millis: Long = 200, listener: () -> Unit) {
-    val lastTime = debounceMap[listener.javaClass.name] ?: 0L
+val debounceMap = mutableMapOf<String, Long>()
+fun debounce(identifier: String? = null, millis: Long = 200, listener: () -> Unit) {
+    //使用 listener.hashCode().toString() 作为唯一标识符，虽然在大多数情况下有效，但如果 listener 是匿名函数或者 lambda 表达式，它们的哈希码可能会重复。
+    val key = identifier ?: listener.hashCode().toString()
+    val lastTime = debounceMap[key] ?: 0L
     val currentTime = System.currentTimeMillis()
     if (currentTime - lastTime >= millis) {
         listener.invoke()
-        debounceMap[listener.javaClass.name] = currentTime
+        debounceMap[key] = currentTime
     }
 }
