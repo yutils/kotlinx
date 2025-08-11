@@ -3,6 +3,8 @@ package com.kotlinx.extend
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import com.kotlinx.Kotlinx.app
 import com.kotlinx.Kotlinx.toast
 import com.kotlinx.utils.ExternalFile
@@ -472,4 +474,29 @@ fun String.groupActual(digit: Int, charset: Charset? = Charset.defaultCharset())
 fun String.insert(digit: Int, insertString: String): String {
     val regex = "(.{$digit})"
     return this.replace(regex.toRegex(), "$1$insertString")
+}
+
+/**
+ * json转对象
+ */
+/*
+举例：
+val json2 = """[{"id":11,"name":"哈哈哈"},{"id":22,"name":"嘿嘿嘿"}]"""
+class TestBean(var id: Int, var name: String?)
+val list = json2.jsonToObject<List<TestBean>>()
+
+for (i in list!!) {
+    Toast.makeText(MainActivity.context, "解析结果:${i.id},${i.name}", Toast.LENGTH_SHORT).show()
+}
+ */
+inline fun <reified T> String.jsonToObject(dateFormat: String? = null): T? {
+    if (this.isBlank()) return null
+    val type = object : TypeToken<T>() {}.type
+    val mGson = if (dateFormat == null) gson else GsonBuilder().setDateFormat(dateFormat).create()
+    return try {
+        mGson.fromJson(this, type)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
 }

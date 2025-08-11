@@ -7,10 +7,10 @@
 # 希望更多小伙伴加入和我一起扩充
 
 [![platform](https://img.shields.io/badge/platform-Android-lightgrey.svg)](https://developer.android.google.cn/studio/index.html)
-![Gradle](https://img.shields.io/badge/Gradle-8.11.1-brightgreen.svg)
+![Gradle](https://img.shields.io/badge/Gradle-9.0.0-brightgreen.svg)
 [![last commit](https://img.shields.io/github/last-commit/yutils/kotlinx.svg)](https://github.com/yutils/kotlinx/commits/master)
 ![repo size](https://img.shields.io/github/repo-size/yutils/kotlinx.svg)
-![android studio](https://img.shields.io/badge/android%20studio-2024.3-green.svg)
+![android studio](https://img.shields.io/badge/android%20studio-2025.1.2-green.svg)
 [![maven](https://img.shields.io/badge/maven-address-green.svg)](https://search.maven.org/artifact/com.kotlinx/kotlinx)
 
 ## 已经从jitpack.io仓库移动至maven中央仓库
@@ -19,12 +19,12 @@
 
 ## Gradle 引用
 
-[添加依赖，当前最新版：————> 1.1.2　　　　![最新版](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88-1.1.2-green.svg)](https://search.maven.org/artifact/com.kotlinx/kotlinx)
+[添加依赖，当前最新版：————> 1.1.4　　　　![最新版](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88-1.1.4-green.svg)](https://search.maven.org/artifact/com.kotlinx/kotlinx)
 
 ```
 dependencies {
      //更新地址  https://github.com/yutils/kotlinx 建议过几天访问看下有没有新版本
-     implementation 'com.kotlinx:kotlinx:1.1.2'
+     implementation 'com.kotlinx:kotlinx:1.1.4'
 }
 ```
 

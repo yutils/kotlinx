@@ -55,13 +55,18 @@ recyclerView.adapter = UserAdapter(list)
 
 
 RecyclerView原生用法：
-//ViewHolder
-class MyViewHolder(var binding: ActivityListItemBinding) : RecyclerView.ViewHolder(binding.root) {}
-class CarAdapter<T>(var list: List<T>?) : RecyclerView.Adapter<MyViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        return MyViewHolder(DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.activity_list_item, parent, false))
+class UserAdapter<T>(var list: List<T>?) : RecyclerView.Adapter<UserAdapter.VH>() {
+    //ViewHolder
+    class VH(
+        parent: ViewGroup,
+        val binding: ItemUserBinding =
+            ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    ) : RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+        return VH(parent)
     }
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: VH, position: Int) {
         val item = list[position] as User
         holder.binding.data = item
         holder.binding.iv.setOnClickListener { ("点击：" + item.name).toast() }
@@ -71,9 +76,70 @@ class CarAdapter<T>(var list: List<T>?) : RecyclerView.Adapter<MyViewHolder>() {
     override fun getItemCount(): Int {
         return list?.size ?: 0
     }
+    fun add(obj: T, position: Int) {
+        if (position > list.size) return
+        list.add(position, obj)
+        notifyDataSetChanged()
+        dataChangeListener?.invoke(list)
+    }
+    fun update(newList: Iterable<T>) {
+        list.clear()
+        for (item in newList) {
+            list.add(item)
+        }
+        notifyDataSetChanged()
+        dataChangeListener?.invoke(list)
+    }
 }
+
+使用
+val adapter = UserAdapter(..)
+binding.rv.layoutManager = LinearLayoutManager(this@UserListActivity)
+binding.rv.adapter=adapter
+
  */
 
+/* ListAdapter 原生用法
+//ListAdapter,高效更新、内置动画、差异计算默认在后台线程进行，不会阻塞主线程、简化Adapter实现
+class UserListAdapter(private val onDeleteClick: (User) -> Unit, private val onChangeClick: (User) -> Unit) : ListAdapter<User, UserListAdapter.VH>(UserDiffCallback()) {
+    //ViewHolder
+    class VH(
+        parent: ViewGroup,
+        val binding: ItemUserBinding =
+            ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    ) : RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+        return VH(parent)
+    }
+    override fun onBindViewHolder(holder: VH, position: Int) {
+        val item = getItem(position)
+        holder.binding.apply {
+            tvId.text = "ID: ${item.id}"
+            tvName.text = "姓名: ${item.name}"
+            btnDelete.setOnClickListener { onDeleteClick(item) }
+            btnChangeName.setOnClickListener { onChangeClick(item) }
+        }
+    }
+}
+class UserDiffCallback : DiffUtil.ItemCallback<User>() {
+    override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
+        return oldItem.id == newItem.id  // 判断两个对象是否代表同一个项目（通常比较唯一标识符）
+    }
+    override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
+        return oldItem == newItem   // 判断两个项目的内容是否相同（比较所有需要显示的字段）
+    }
+}
+
+//使用
+val adapter = UserListAdapter(..)
+binding.rv.layoutManager = LinearLayoutManager(this@UserListActivity)
+binding.rv.adapter=adapter
+
+//更新、删除、修改数据
+adapter.submitList(users)
+
+ */
 
 //region 下拉刷新，上拉加载完整演示
 /*
