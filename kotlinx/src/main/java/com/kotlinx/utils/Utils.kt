@@ -9,7 +9,6 @@ import com.kotlinx.extend.toFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 
 object Utils {
@@ -18,6 +17,9 @@ object Utils {
 
 /**外部扩展文件*/
 object ExternalFile {
+    // 缓存 HashMap，存储文件名和内容的映射
+    private val cache = HashMap<String, String?>()
+
     /**实际目录:Android/data/包名/files/
      * 返回的字符串末尾没有 /
      */
@@ -33,7 +35,19 @@ object ExternalFile {
         set(value) = ExternalFile.writeFile(value, "服务器IP.txt")
     */
     fun readFile(fileName: String): String? {
-        return File(getDir(), fileName).string()
+        // 优先从缓存读取
+        if (cache.containsKey(fileName)) {
+            return cache[fileName]
+        }
+        // 缓存不存在，从文件读取
+        val content = File(getDir(), fileName).string()
+        // 如果 content 为 null，移除缓存，否则更新缓存
+        if (content == null) {
+            cache.remove(fileName)
+        } else {
+            cache[fileName] = content
+        }
+        return content
     }
 
     /**写入文本到外部储存*/
@@ -43,7 +57,19 @@ object ExternalFile {
         set(value) = ExternalFile.writeFile(value.toString(), "端口.txt")
      */
     fun writeFile(value: String?, fileName: String) {
+        // 写入文件
         (value ?: "").toFile(getDir() + "/" + fileName)
+        // 如果 value 为 null，从缓存中删除，否则更新缓存
+        if (value == null) {
+            cache.remove(fileName)
+        } else {
+            cache[fileName] = value
+        }
+    }
+
+    /**清除缓存*/
+    fun clearCache() {
+        cache.clear()
     }
 }
 
@@ -62,31 +88,12 @@ fun isUI(): Boolean {
 /**
  * 主线程中运行,协程
  */
-fun ui(runnable: Runnable) {
-    CoroutineScope(Dispatchers.Main).launch { withContext(Dispatchers.Main) { runnable.run() } }
-}
-
-/**
- * 主线程中运行,协程
- */
-fun ui(block: suspend CoroutineScope.() -> Unit) {
-    CoroutineScope(Dispatchers.Main).launch { withContext(Dispatchers.Main, block) }
-}
-
-
-/**
- * 子线程中运行,协程
- */
-fun io(runnable: Runnable) {
-    CoroutineScope(Dispatchers.IO).launch { withContext(Dispatchers.IO) { runnable.run() } }
-}
+fun ui(block: suspend CoroutineScope.() -> Unit) = CoroutineScope(Dispatchers.Main).launch(block = block)
 
 /**
  * 子线程中运行,协程，睡眠不要用Thread.sleep()，应该用delay()
  */
-fun io(block: suspend CoroutineScope.() -> Unit) {
-    CoroutineScope(Dispatchers.IO).launch { withContext(Dispatchers.IO, block) }
-}
+fun io(block: suspend CoroutineScope.() -> Unit) = CoroutineScope(Dispatchers.IO).launch(block = block)
 
 /**
  * 防抖延迟，默认每200毫秒，最多执行一次
@@ -101,4 +108,8 @@ fun debounce(identifier: String? = null, millis: Long = 200, listener: () -> Uni
         listener.invoke()
         debounceMap[key] = currentTime
     }
+}
+
+fun debounce(millis: Long = 200, listener: () -> Unit) {
+    debounce(null, millis, listener)
 }

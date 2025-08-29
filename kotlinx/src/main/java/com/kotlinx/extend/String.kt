@@ -5,8 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.kotlinx.Kotlinx.app
-import com.kotlinx.Kotlinx.toast
+import com.kotlinx.Kotlinx
 import com.kotlinx.utils.ExternalFile
 import com.kotlinx.utils.TTS
 import com.kotlinx.utils.ui
@@ -212,13 +211,13 @@ fun String.toast(): String {
 fun String.toastShort(): String {
     val string = this
     ui {
-        toast?.let {
-            toast?.cancel()
-            toast = null
+        Kotlinx.toast?.let {
+            Kotlinx.toast?.cancel()
+            Kotlinx.toast = null
         }
-        val value: String? = if (toastfilter != null) toastfilter?.invoke(string) else string
-        toast = Toast.makeText(app, value, Toast.LENGTH_SHORT)
-        toast?.show()
+        val value: String? = if (toastFilter != null) toastFilter?.invoke(string) else string
+        Kotlinx.toast = Toast.makeText(Kotlinx.app, value, Toast.LENGTH_SHORT)
+        Kotlinx.toast?.show()
     }
     return this
 }
@@ -227,13 +226,13 @@ fun String.toastShort(): String {
 fun String.toastLong(): String {
     val string = this
     ui {
-        toast?.let {
-            toast?.cancel()
-            toast = null
+        Kotlinx.toast?.let {
+            Kotlinx.toast?.cancel()
+            Kotlinx.toast = null
         }
-        val value: String? = if (toastfilter != null) toastfilter?.invoke(string) else string
-        toast = Toast.makeText(app, value, Toast.LENGTH_LONG)
-        toast?.show()
+        val value: String? = if (toastFilter != null) toastFilter?.invoke(string) else string
+        Kotlinx.toast = Toast.makeText(Kotlinx.app, value, Toast.LENGTH_LONG)
+        Kotlinx.toast?.show()
     }
     return this
 }
@@ -489,12 +488,19 @@ for (i in list!!) {
     Toast.makeText(MainActivity.context, "解析结果:${i.id},${i.name}", Toast.LENGTH_SHORT).show()
 }
  */
-inline fun <reified T> String.jsonToObject(dateFormat: String? = null): T? {
-    if (this.isBlank()) return null
+inline fun <reified T> String?.jsonToObject(dateFormat: String? = null): T? {
+    if (this == null) return null
     val type = object : TypeToken<T>() {}.type
     val mGson = if (dateFormat == null) gson else GsonBuilder().setDateFormat(dateFormat).create()
+    return mGson.fromJson(this, type)
+}
+
+// val list = json2.jsonToObjectOrNull<List<TestBean>>()
+inline fun <reified T> String?.jsonToObjectOrNull(dateFormat: String? = null): T? {
+    if (this == null && T::class.java.isAssignableFrom(List::class.java)) return emptyList<Any>() as T
+    if (this == null) return null
     return try {
-        mGson.fromJson(this, type)
+        this.jsonToObject(dateFormat)
     } catch (e: Exception) {
         e.printStackTrace()
         null

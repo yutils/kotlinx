@@ -19,13 +19,14 @@ fun File.toByteArray(): ByteArray? {
                 return out.toByteArray()
             }
         }
-    } catch (ignored: IOException) {
+    } catch (e: IOException) {
+        "读取文件失败 ${e.message}".logE()
     }
     return null
 }
 
 /** 读取文件并返回String*/
-/*举例 var s= File("D:/abc.txt").toString() */
+/*举例 var s= File("D:/abc.txt").string() */
 fun File.string(charset: Charset = Charset.defaultCharset()): String? {
     return this.toByteArray()?.let { String(it, charset) }
 }
