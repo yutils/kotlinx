@@ -7,7 +7,11 @@ import com.kotlinx.Kotlinx
 import com.kotlinx.extend.logE
 import com.kotlinx.extend.logI
 import com.kotlinx.extend.toast
-import java.util.*
+import com.kotlinx.utils.TTS.speak
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import java.util.Locale
 
 /**
  * TTS 语音
@@ -63,10 +67,12 @@ object TTS {
                         if (SHOW_LOG) "TTS初始化失败，语言包丢失".logE(TAG)
                         1
                     }
+
                     TextToSpeech.LANG_NOT_SUPPORTED -> {
                         if (SHOW_LOG) "TTS初始化失败，语音不支持".logE(TAG)
                         2
                     }
+
                     else -> {
                         if (SHOW_LOG) "TTS初始化成功".logI(TAG)
                         0
@@ -122,9 +128,6 @@ object TTS {
     }
 
 
-    //循环线程
-    private var loopThread: Thread? = null
-
     /**
      * 循环播放语音，直到下一条，或者loopClose()
      */
@@ -143,30 +146,28 @@ object TTS {
         loop(intervalTime) { speakQueue(str) }
     }
 
+    private var job: Job? = null
+
     @Synchronized
     @JvmStatic
     fun loop(intervalTime: Long, listener: () -> Unit) {
-        loopThread?.interrupt()
-        loopThread = Thread {
-            while (!Thread.interrupted()) {
+        job?.cancel()
+        job = io {
+            while (this.isActive) {
                 try {
                     listener.invoke()
-                    Thread.sleep(intervalTime)
-                } catch (e: InterruptedException) {
-                    Thread.currentThread().interrupt()
-                    break
+                    delay(intervalTime)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     continue
                 }
             }
         }
-        loopThread?.start()
     }
 
     @JvmStatic
     fun loopClose() {
-        loopThread?.interrupt()
+        job?.cancel()
     }
 
     /**

@@ -48,9 +48,11 @@ import com.kotlinx.extend.writePath
 import com.kotlinx.test.MainActivity.Companion.activity
 import com.kotlinx.test.ui.theme.KotlinxTheme
 import com.kotlinx.utils.ExternalFile
+import com.kotlinx.utils.TTS
 import com.kotlinx.utils.io
 import com.kotlinx.utils.ui
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import java.io.File
 import java.util.Date
 
@@ -221,6 +223,16 @@ fun Greeting(name: String) {
                 Text(text = "读文件", style = TextStyle(color = Color.White, fontSize = 12.sp))
             }
 
+            Button(modifier = Modifier.padding(0.dp), onClick = {
+                TTS.loopSpeak("测试", 1000)
+            }) {
+                Text(text = "协程", style = TextStyle(color = Color.White, fontSize = 12.sp))
+            }
+            Button(modifier = Modifier.padding(0.dp), onClick = {
+                TTS.loopClose()
+            }) {
+                Text(text = "协程", style = TextStyle(color = Color.White, fontSize = 12.sp))
+            }
         }
     }
 }

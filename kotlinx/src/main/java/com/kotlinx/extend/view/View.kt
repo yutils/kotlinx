@@ -81,19 +81,27 @@ fun View.setCustomLongClickListener(durationMs: Long = 4000L, action: (View) -> 
  * 双击监听 自定义时长
  */
 fun View.setCustomDoubleClickListener(doubleClickIntervalMs: Long = 300, action: (View) -> Unit) {
+    this.setCustomMultipleClickListener(doubleClickIntervalMs, 2, action)
+}
+
+
+/**
+ * 多击监听 自定义时长  指定时间内点击多次
+ */
+fun View.setCustomMultipleClickListener(doubleClickIntervalMs: Long = 3000, clickCount: Int = 5, action: (View) -> Unit) {
     var lastClickTime = 0L
-    var clickCount = 0
+    var count = 0
     setOnClickListener {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastClickTime <= doubleClickIntervalMs) {
-            clickCount++
-            if (clickCount == 2) {
+            count++
+            if (count == clickCount) {
                 action(this)
-                clickCount = 0 // 重置计数
+                count = 0 // 重置计数
                 it.performClick() // Accessibility 支持
             }
         } else {
-            clickCount = 1 // 第一次点击
+            count = 1 // 第一次点击
         }
         lastClickTime = currentTime
     }
