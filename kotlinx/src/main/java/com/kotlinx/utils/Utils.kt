@@ -168,8 +168,14 @@ fun io(
  */
 val debounceMap = mutableMapOf<String, Long>()
 fun debounce(identifier: String? = null, millis: Long = 200, listener: () -> Unit) {
-    //使用 listener.hashCode().toString() 作为唯一标识符，虽然在大多数情况下有效，但如果 listener 是匿名函数或者 lambda 表达式，它们的哈希码可能会重复。
-    val key = identifier ?: listener.hashCode().toString()
+    val key = identifier ?: try {
+        val stackTrace = Throwable().stackTrace
+        val stack = stackTrace[2]
+        "${stack.fileName}:${stack.lineNumber}"//类名+行号如：AbcActivity.kt:84
+    } catch (_: Exception) {
+        // 兜底用 hashCode（但这不是最佳）
+        listener.hashCode().toString()
+    }
     val lastTime = debounceMap[key] ?: 0L
     val currentTime = System.currentTimeMillis()
     if (currentTime - lastTime >= millis) {
@@ -179,5 +185,18 @@ fun debounce(identifier: String? = null, millis: Long = 200, listener: () -> Uni
 }
 
 fun debounce(millis: Long = 200, listener: () -> Unit) {
-    debounce(null, millis, listener)
+    val key = try {
+        val stackTrace = Throwable().stackTrace
+        val stack = stackTrace[2]
+        "${stack.fileName}:${stack.lineNumber}"//类名+行号如：AbcActivity.kt:84
+    } catch (_: Exception) {
+        // 兜底用 hashCode（但这不是最佳）
+        listener.hashCode().toString()
+    }
+    val lastTime = debounceMap[key] ?: 0L
+    val currentTime = System.currentTimeMillis()
+    if (currentTime - lastTime >= millis) {
+        listener.invoke()
+        debounceMap[key] = currentTime
+    }
 }

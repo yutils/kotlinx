@@ -38,6 +38,20 @@ fun View.setCustomOnClickListener(debounceMs: Long = 500, action: (View) -> Unit
         }
     }
 }
+/**
+ * 防抖点击方法 自定义时长
+ */
+fun View.debounceClick(debounceMs: Long = 500, action: (View) -> Unit) {
+    var lastClickTime = 0L
+    setOnClickListener {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastClickTime >= debounceMs) {
+            lastClickTime = currentTime
+            action(this)
+            it.performClick() // 确保 Accessibility 支持
+        }
+    }
+}
 
 /**
  * 长按方法 自定义时长

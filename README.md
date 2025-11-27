@@ -19,12 +19,12 @@
 
 ## Gradle 引用
 
-[添加依赖，当前最新版：————> 1.1.6　　　　![最新版](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88-1.1.6-green.svg)](https://search.maven.org/artifact/com.kotlinx/kotlinx)
+[添加依赖，当前最新版：————> 1.1.7　　　　![最新版](https://img.shields.io/badge/%E6%9C%80%E6%96%B0%E7%89%88-1.1.7-green.svg)](https://search.maven.org/artifact/com.kotlinx/kotlinx)
 
 ```
 dependencies {
      //更新地址  https://github.com/yutils/kotlinx 建议过几天访问看下有没有新版本
-     implementation 'com.kotlinx:kotlinx:1.1.6'
+     implementation 'com.kotlinx:kotlinx:1.1.7'
 }
 ```
 
@@ -112,4 +112,9 @@ recyclerView.scrollToTopListener {
 recyclerView.scrollToBottomListener {
     //加载逻辑
 }
+//点击防抖
+view.debounceClick {
+    
+}
+
 ```

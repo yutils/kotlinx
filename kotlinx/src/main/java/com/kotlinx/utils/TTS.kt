@@ -113,7 +113,7 @@ object TTS {
         } else {
             textToSpeech?.speak(speak, TextToSpeech.QUEUE_FLUSH, null)
         }
-        if (SHOW_LOG) "$speak".logI(TAG)
+        if (SHOW_LOG) speak.logI(TAG)
         history.add(0, speak)
         if (history.size > 1000) history.removeAt(history.size - 1)
     }
@@ -188,7 +188,7 @@ object TTS {
         } else {
             textToSpeech?.speak(speak, TextToSpeech.QUEUE_ADD, null)
         }
-        if (SHOW_LOG) "$speak".logI(TAG)
+        if (SHOW_LOG) speak.logI(TAG)
         history.add(0, speak)
         if (history.size > 1000) history.removeAt(history.size - 1)
     }
