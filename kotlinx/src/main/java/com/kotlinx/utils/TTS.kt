@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.kotlinx.utils
 
 import android.content.Context
@@ -12,6 +14,16 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import java.util.Locale
+
+private const val SG_TTS_PACKAGE = "org.nobody.sgtts"
+
+/**
+ * 默认 TTS 引擎包名尝试顺序（[init] 未传入非空的 `enginePackages` 且 [TTS.enginePackageOrder] 为 null 时使用）。
+ * 靠前的优先；某一引擎初始化并设置语言成功后即停止。
+ * 若列表中的引擎均不可用且 [TTS.fallbackToSystemDefaultEngine] 为 true，会再选用系统设置的「默认朗读引擎」
+ * （即 [TextToSpeech] 构造函数第三参传 `null`）。
+ */
+val DEFAULT_TTS_ENGINE_PACKAGES: List<String> = listOf()
 
 /**
  * TTS 语音
@@ -35,6 +47,58 @@ TTS.filter={ it.replace("张三", "李四") }
 
 //退出时关闭，释放资源
 TTS.destroy()
+
+//自定义引擎顺序（可选，二选一；init 传入 enginePackages 时优先生效）
+TTS.enginePackageOrder = listOf(
+    "com.iflytek.speechsuite",          // 讯飞 64 位
+    "com.iflytek.speechcloud",          // 讯飞 32 位
+    "com.xiaomi.mibrain.speech",        // 小米 TTS
+    "org.nobody.sgtts",                 // 搜狗 TTS（成功时自动将 [TTS.speechRate] 设为 2.5）
+    "com.hikvision.hikttsservice",      // 海康威视
+    "com.baidu.duersdk.opensdk",        // 度秘语音
+    "com.vivo.aiservice"                // vivo
+)
+TTS.init(context)
+
+//或单次指定顺序
+TTS.init(context, listOf(
+    "com.iflytek.speechsuite",          // 讯飞 64 位
+    "com.iflytek.speechcloud",          // 讯飞 32 位
+    "com.xiaomi.mibrain.speech",        // 小米 TTS
+    "org.nobody.sgtts",                 // 搜狗 TTS（成功时自动将 [TTS.speechRate] 设为 2.5）
+    "com.hikvision.hikttsservice",      // 海康威视
+    "com.baidu.duersdk.opensdk",        // 度秘语音
+    "com.vivo.aiservice"                // vivo
+)) { ok -> }
+
+//列表里没有该机型自带的引擎：在工程里写明包名，或依赖「系统默认」（白名单全失败后自动尝试，可关掉）
+TTS.fallbackToSystemDefaultEngine = true
+TTS.init(context)
+//只听系统默认（不先试白名单）：
+TTS.fallbackToSystemDefaultEngine = true
+TTS.enginePackageOrder = emptyList()
+TTS.init(context)
+
+必须 AndroidManifest.xml添加
+<queries>
+    <!-- 允许查询所有 TTS 服务 -->
+    <!-- 讯飞64位 -->
+    <package android:name="com.iflytek.speechsuite" />
+    <!-- 讯飞32位 -->
+    <package android:name="com.iflytek.speechcloud" />
+    <!-- 小米TTS -->
+    <package android:name="com.xiaomi.mibrain.speech" />
+    <!-- 搜狗TTS -->
+    <package android:name="org.nobody.sgtts" />
+    <!-- 海康威视 -->
+    <package android:name="com.hikvision.hikttsservice" />
+    <!-- 度秘语音 -->
+    <package android:name="com.baidu.duersdk.opensdk" />
+    <!-- 谷歌TTS -->
+    <package android:name="com.google.android.tts" />
+    <!-- vivo -->
+    <package android:name="com.vivo.aiservice" />
+</queries>
  */
 object TTS {
     private const val TAG = "TTS"
@@ -51,38 +115,129 @@ object TTS {
     var history = mutableListOf<String>()//历史记录，倒序，最多1000条
 
     /**
-     * 初始化
+     * 自定义引擎包名顺序。
+     * [init] 的 `enginePackages` 非 null 时仅用传入列表；否则用本属性；本属性仍为 null 时用 [DEFAULT_TTS_ENGINE_PACKAGES]。
+     */
+    @Volatile
+    var enginePackageOrder: List<String>? = null
+
+    /**
+     * 白名单中引擎全部失败（或未安装）时，是否最后用系统设置的默认 TTS（[TextToSpeech] 绑定 `engine = null`）。
+     */
+    @Volatile
+    var fallbackToSystemDefaultEngine: Boolean = true
+
+    /**
+     * 初始化：按引擎列表依次尝试，直到某一引擎成功且中文可用为止。
+     *
      * @param context 上下文
+     * @param enginePackages 引擎包名顺序，null 则使用 [enginePackageOrder]，再默认为 [DEFAULT_TTS_ENGINE_PACKAGES]
      * @param initListener 初始化监听
      */
+    @JvmOverloads
     @Synchronized
     @JvmStatic
-    fun init(context: Context?, initListener: ((Boolean) -> Unit)? = null) {
+    fun init(
+        context: Context?,
+        enginePackages: List<String>? = null,
+        initListener: ((Boolean) -> Unit)? = null,
+    ) {
         if (context == null || initState == 0 || textToSpeech != null) return
-        textToSpeech = TextToSpeech(context) { status: Int ->
+        val appContext = context.applicationContext
+        val packages = (
+                enginePackages
+                    ?: enginePackageOrder
+                    ?: DEFAULT_TTS_ENGINE_PACKAGES
+                ).map { it.trim() }.filter { it.isNotEmpty() }
+        tryInitEngine(appContext, packages, 0, initListener)
+    }
+
+    /** @see init */
+    @JvmStatic
+    fun init(context: Context?, initListener: ((Boolean) -> Unit)?) {
+        init(context, enginePackages = null, initListener = initListener)
+    }
+
+    private fun initAllEnginesFailed(initListener: ((Boolean) -> Unit)?) {
+        if (SHOW_LOG) "TTS初始化失败，已尝试全部候选引擎".logE(TAG)
+        initState = 3
+        initListener?.invoke(false)
+    }
+
+    /**
+     * @param enginePkg 若为 null，使用系统设置的默认朗读引擎。
+     */
+    private fun bindOneEngine(
+        context: Context,
+        enginePkg: String?,
+        initListener: ((Boolean) -> Unit)?,
+        onFailTryNext: () -> Unit,
+    ) {
+        val logTag = enginePkg ?: "(系统默认引擎)"
+        textToSpeech = TextToSpeech(context, { status: Int ->
+            val tts = textToSpeech
+            if (tts == null) {
+                initState = -1
+                initListener?.invoke(false)
+                return@TextToSpeech
+            }
             if (status == TextToSpeech.SUCCESS) {
-                val result = textToSpeech!!.setLanguage(Locale.CHINA)
+                val result = tts.setLanguage(Locale.CHINA)
                 initState = when (result) {
                     TextToSpeech.LANG_MISSING_DATA -> {
-                        if (SHOW_LOG) "TTS初始化失败，语言包丢失".logE(TAG)
+                        if (SHOW_LOG) "TTS初始化失败[$logTag]，语言包丢失".logE(TAG)
                         1
                     }
 
                     TextToSpeech.LANG_NOT_SUPPORTED -> {
-                        if (SHOW_LOG) "TTS初始化失败，语音不支持".logE(TAG)
+                        if (SHOW_LOG) "TTS初始化失败[$logTag]，语音不支持".logE(TAG)
                         2
                     }
 
                     else -> {
-                        if (SHOW_LOG) "TTS初始化成功".logI(TAG)
+                        if (SHOW_LOG) "TTS初始化成功: $logTag".logI(TAG)
+                        if (enginePkg == SG_TTS_PACKAGE) {
+                            speechRate = 2.5f
+                        }
                         0
                     }
                 }
+                if (initState == 0) {
+                    initListener?.invoke(true)
+                } else {
+                    tts.shutdown()
+                    textToSpeech = null
+                    initState = -1
+                    onFailTryNext()
+                }
             } else {
-                if (SHOW_LOG) "TTS初始化失败:$status".logE(TAG)
-                initState = 3
+                if (SHOW_LOG) "TTS初始化失败[$logTag]:$status".logE(TAG)
+                tts.shutdown()
+                textToSpeech = null
+                initState = -1
+                onFailTryNext()
             }
-            initListener?.invoke(initState == 0)
+        }, enginePkg)
+    }
+
+    private fun tryInitEngine(
+        context: Context,
+        packages: List<String>,
+        index: Int,
+        initListener: ((Boolean) -> Unit)?,
+    ) {
+        if (index < packages.size) {
+            bindOneEngine(context, packages[index], initListener) {
+                tryInitEngine(context, packages, index + 1, initListener)
+            }
+            return
+        }
+        if (fallbackToSystemDefaultEngine) {
+            bindOneEngine(context, null, initListener) {
+                initAllEnginesFailed(initListener)
+            }
+        } else {
+            initAllEnginesFailed(initListener)
         }
     }
 

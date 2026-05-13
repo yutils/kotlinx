@@ -24,7 +24,7 @@
 ```
 dependencies {
      //更新地址  https://github.com/yutils/kotlinx 建议过几天访问看下有没有新版本
-     implementation 'com.kotlinx:kotlinx:1.1.7'
+     implementation 'com.kotlinx:kotlinx:1.1.8'
 }
 ```
 

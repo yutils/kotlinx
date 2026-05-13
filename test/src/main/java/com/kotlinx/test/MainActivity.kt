@@ -127,6 +127,28 @@ fun Greeting(name: String) {
                 )
             }
 
+            Button(
+                modifier = Modifier.padding(0.dp),
+                onClick = {
+//                    TTS.enginePackageOrder = listOf(
+//                        "com.iflytek.speechsuite",          // 讯飞 64 位
+//                        "com.iflytek.speechcloud",          // 讯飞 32 位
+//                        "com.xiaomi.mibrain.speech",        // 小米 TTS
+//                        "org.nobody.sgtts",                 // 搜狗 TTS（成功时自动将 [TTS.speechRate] 设为 2.5）
+//                        "com.hikvision.hikttsservice",      // 海康威视
+//                        "com.baidu.duersdk.opensdk",        // 度秘语音
+//                        "com.vivo.aiservice"                // vivo
+//                    )
+                    "TTS播放测试,必须在 Manifest 声明要查询的 TTS 引擎".speak()
+                },
+            ) {
+                Text(
+                    text = "TTS",
+                    style = TextStyle(color = Color.White, fontSize = 12.sp)
+                )
+            }
+
+
             Button(modifier = Modifier.padding(0.dp), onClick = {
                 println("你好".toBase64String()).showStackTrace()
                 MainActivity.context?.startActivity(Intent(MainActivity.context, RecyclerViewTestActivity::class.java))
