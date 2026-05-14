@@ -497,8 +497,13 @@ inline fun <reified T> String?.jsonToObject(dateFormat: String? = null): T? {
 
 // val list = json2.jsonToObjectOrNull<List<TestBean>>()
 inline fun <reified T> String?.jsonToObjectOrNull(dateFormat: String? = null): T? {
-    if (this == null && T::class.java.isAssignableFrom(List::class.java)) return emptyList<Any>() as T
-    if (this == null) return null
+    if (this == null) {
+        @Suppress("UNCHECKED_CAST")
+        return when (T::class) {
+            List::class, MutableList::class -> emptyList<Any>() as T
+            else -> null
+        }
+    }
     return try {
         this.jsonToObject(dateFormat)
     } catch (e: Exception) {

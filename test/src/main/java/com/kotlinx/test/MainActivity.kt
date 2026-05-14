@@ -52,7 +52,6 @@ import com.kotlinx.utils.TTS
 import com.kotlinx.utils.io
 import com.kotlinx.utils.ui
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import java.io.File
 import java.util.Date
 
@@ -254,6 +253,24 @@ fun Greeting(name: String) {
                 TTS.loopClose()
             }) {
                 Text(text = "协程", style = TextStyle(color = Color.White, fontSize = 12.sp))
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color.Cyan), horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            Button(modifier = Modifier.padding(0.dp), onClick = {
+                "123456789".writePath("test.txt")
+                "写入成功".toast()
+            }) {
+                Text(text = "直接写文件", style = TextStyle(color = Color.White, fontSize = 12.sp))
+            }
+            Button(modifier = Modifier.padding(0.dp), onClick = {
+                val value = "test.txt".readPath()
+                (value ?: "读取失败").toast()
+            }) {
+                Text(text = "直接读文件", style = TextStyle(color = Color.White, fontSize = 12.sp))
             }
         }
     }

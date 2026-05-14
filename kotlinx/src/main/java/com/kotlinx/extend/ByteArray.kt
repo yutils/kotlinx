@@ -21,36 +21,45 @@ import java.io.RandomAccessFile
  * base64的ByteArray转码返回String
  */
 fun ByteArray.toBase64EncodeToString(): String {
-    try {
-        return Base64.encodeToString(this, Base64.NO_WRAP) //不自动换行
+    return try {
+        Base64.encodeToString(this, Base64.NO_WRAP) //不自动换行
     } catch (e: Exception) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) return java.util.Base64.getEncoder().encodeToString(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            java.util.Base64.getEncoder().encodeToString(this)
+        } else {
+            throw e
+        }
     }
-    return Base64.encodeToString(this, Base64.NO_WRAP) //不自动换行
 }
 
 /**
  * base64的ByteArray转码返回ByteArray
  */
 fun ByteArray.toBase64Encode(): ByteArray {
-    try {
-        return Base64.encode(this, Base64.NO_WRAP) //不自动换行
+    return try {
+        Base64.encode(this, Base64.NO_WRAP) //不自动换行
     } catch (e: Exception) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) return java.util.Base64.getEncoder().encode(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            java.util.Base64.getEncoder().encode(this)
+        } else {
+            throw e
+        }
     }
-    return Base64.encode(this, Base64.NO_WRAP) //不自动换行
 }
 
 /**
  * base64解码 返回ByteArray
  */
 fun ByteArray.toBase64Decode(): ByteArray {
-    try {
-        return Base64.decode(this, Base64.NO_WRAP) //不自动换行
+    return try {
+        Base64.decode(this, Base64.NO_WRAP) //不自动换行
     } catch (e: Exception) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) return java.util.Base64.getDecoder().decode(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            java.util.Base64.getDecoder().decode(this)
+        } else {
+            throw e
+        }
     }
-    return Base64.decode(this, Base64.NO_WRAP) //不自动换行
 }
 
 /**

@@ -239,9 +239,10 @@ abstract class BaseAdapter<T>(val layout: Int, val list: MutableList<T> = mutabl
 
     var isSelect: Int = -1
         set(value) {
-            notifyItemRangeChanged(field, list.size)
+            val old = field
             field = value
-            notifyItemRangeChanged(value, list.size)
+            if (old in list.indices) notifyItemChanged(old)
+            if (value in list.indices) notifyItemChanged(value)
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder {
@@ -293,7 +294,7 @@ abstract class BaseAdapter<T>(val layout: Int, val list: MutableList<T> = mutabl
     fun update(obj: T, position: Int) {
         if (position in 0 until list.size) {
             list[position] = obj
-            notifyItemRangeChanged(position, position)
+            notifyItemChanged(position)
             dataChangeListener?.invoke(list)
         }
     }

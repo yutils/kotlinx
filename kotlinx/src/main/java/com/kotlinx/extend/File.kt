@@ -12,7 +12,13 @@ import java.nio.charset.Charset
 fun File.toByteArray(): ByteArray? {
     try {
         FileInputStream(this).use { stream ->
-            ByteArrayOutputStream(this.length().toInt()).use { out ->
+            val len = length()
+            val initialCapacity = when {
+                len <= 0L -> 0
+                len > Int.MAX_VALUE -> 8192
+                else -> len.toInt()
+            }
+            ByteArrayOutputStream(initialCapacity).use { out ->
                 val b = ByteArray(1024 * 4)
                 var n: Int
                 while (stream.read(b).also { n = it } != -1) out.write(b, 0, n)

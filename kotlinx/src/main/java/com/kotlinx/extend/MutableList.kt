@@ -32,15 +32,11 @@ inline fun <T> MutableList<T>.addAndReplace(newList: Iterable<T>, identical: (T,
  */
 fun MutableList<Any>?.toString(): String {
     if (this == null) return "null"
-    val iMax = this.size - 1
-    if (iMax == -1) return "[]"
-    val b = StringBuilder()
-    b.append('[')
-    var i = 0
-    while (true) {
+    if (this.isEmpty()) return "[]"
+    val b = StringBuilder().append('[')
+    for (i in this.indices) {
+        if (i > 0) b.append(", ")
         b.append(this[i].toString())
-        if (i == iMax) return b.append(']').toString()
-        if (i != 0) b.append(", ")
-        i++
     }
+    return b.append(']').toString()
 }
