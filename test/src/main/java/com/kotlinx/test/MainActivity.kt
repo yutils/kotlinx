@@ -113,6 +113,17 @@ fun Greeting(name: String) {
                 .fillMaxWidth()
                 .background(color = Color.Cyan), horizontalArrangement = Arrangement.SpaceAround
         ) {
+            Button(modifier = Modifier.padding(0.dp), onClick = {
+                MainActivity.context?.startActivity(Intent(MainActivity.context, MainActivity2::class.java))
+            }) {
+                Text(text = "扩展演示", style = TextStyle(color = Color.White, fontSize = 12.sp))
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color.Cyan), horizontalArrangement = Arrangement.SpaceAround
+        ) {
             var i = 0
             Button(
                 modifier = Modifier.padding(0.dp),
@@ -147,7 +158,6 @@ fun Greeting(name: String) {
                 )
             }
 
-
             Button(modifier = Modifier.padding(0.dp), onClick = {
                 println("你好".toBase64String()).showStackTrace()
                 MainActivity.context?.startActivity(Intent(MainActivity.context, RecyclerViewTestActivity::class.java))
@@ -157,6 +167,12 @@ fun Greeting(name: String) {
                     style = TextStyle(color = Color.White, fontSize = 12.sp)
                 )
             }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color.Cyan), horizontalArrangement = Arrangement.SpaceAround
+        ) {
 
             Button(modifier = Modifier.padding(0.dp), onClick = {
                 showStackTrace() //打印堆栈信息
@@ -243,9 +259,14 @@ fun Greeting(name: String) {
             }) {
                 Text(text = "读文件", style = TextStyle(color = Color.White, fontSize = 12.sp))
             }
-
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color.Cyan), horizontalArrangement = Arrangement.SpaceAround
+        ) {
             Button(modifier = Modifier.padding(0.dp), onClick = {
-                TTS.loopSpeak("测试", 1000)
+                TTS.loopSpeak("测试", 100)
             }) {
                 Text(text = "协程", style = TextStyle(color = Color.White, fontSize = 12.sp))
             }
@@ -254,12 +275,6 @@ fun Greeting(name: String) {
             }) {
                 Text(text = "协程", style = TextStyle(color = Color.White, fontSize = 12.sp))
             }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = Color.Cyan), horizontalArrangement = Arrangement.SpaceAround
-        ) {
             Button(modifier = Modifier.padding(0.dp), onClick = {
                 "123456789".writePath("test.txt")
                 "写入成功".toast()
