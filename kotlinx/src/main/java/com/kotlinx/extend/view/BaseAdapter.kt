@@ -255,10 +255,19 @@ abstract class BaseAdapter<T>(val layout: Int, val list: MutableList<T> = mutabl
 
     override fun onBindViewHolder(holder: BaseHolder, position: Int) {
         item(holder, position)
-        //单击
-        holder.binding.root.setOnClickListener { debounce(millis = debounceMillis) { onItemClickListener?.invoke(position) } }
+        //单击（使用 bindingAdapterPosition，避免列表变更后闭包捕获过期下标）
+        holder.binding.root.setOnClickListener {
+            debounce(millis = debounceMillis) {
+                val pos = holder.absoluteAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) onItemClickListener?.invoke(pos)
+            }
+        }
         //长按
-        holder.binding.root.setOnLongClickListener { onItemLongClickListener?.invoke(position);false }
+        holder.binding.root.setOnLongClickListener {
+            val pos = holder.absoluteAdapterPosition
+            if (pos != RecyclerView.NO_POSITION) onItemLongClickListener?.invoke(pos)
+            false
+        }
         //必须要有这行，防止闪烁
         holder.binding.executePendingBindings()
     }

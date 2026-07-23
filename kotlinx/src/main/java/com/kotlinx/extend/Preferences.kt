@@ -8,7 +8,7 @@ fun Context.kotlinxPrefs(name: String = "kotlinx_prefs"): SharedPreferences =
     getSharedPreferences(name, Context.MODE_PRIVATE)
 
 inline fun <reified T> SharedPreferences.getJsonOrNull(key: String): T? =
-    getString(key, null)?.jsonToObject()
+    getString(key, null)?.jsonToObjectOrNull()
 
 fun SharedPreferences.putJson(key: String, value: Any?) {
     edit { putString(key, value?.toJson()) }

@@ -8,7 +8,6 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.view.HapticFeedbackConstants
 import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 
 private fun Context.systemVibrator(): Vibrator? {
@@ -44,8 +43,11 @@ fun View.performLightHapticTap() {
     performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
 }
 
-/** 确认类触感（不声明权限）。 */
-@RequiresApi(Build.VERSION_CODES.R)
+/** 确认类触感；API 30 以下回退为 KEYBOARD_TAP。 */
 fun View.performConfirmHaptic() {
-    performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+    } else {
+        performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+    }
 }

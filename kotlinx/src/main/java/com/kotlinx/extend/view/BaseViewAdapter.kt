@@ -86,9 +86,10 @@ abstract class BaseViewAdapter<T>(val list: MutableList<T> = mutableListOf()) : 
 
     var isSelect: Int = -1
         set(value) {
-            notifyItemRangeChanged(field, list.size)
+            val old = field
             field = value
-            notifyItemRangeChanged(value, list.size)
+            if (old in list.indices) notifyItemChanged(old)
+            if (value in list.indices) notifyItemChanged(value)
         }
 
     abstract fun getView(): View
@@ -100,10 +101,19 @@ abstract class BaseViewAdapter<T>(val list: MutableList<T> = mutableListOf()) : 
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         item(holder, position)
-        //单击
-        holder.root.setOnClickListener { debounce(millis = debounceMillis) { onItemClickListener?.invoke(position) } }
+        //单击（使用 bindingAdapterPosition，避免列表变更后闭包捕获过期下标）
+        holder.root.setOnClickListener {
+            debounce(millis = debounceMillis) {
+                val pos = holder.absoluteAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) onItemClickListener?.invoke(pos)
+            }
+        }
         //长按
-        holder.root.setOnLongClickListener { onItemLongClickListener?.invoke(position);false }
+        holder.root.setOnLongClickListener {
+            val pos = holder.absoluteAdapterPosition
+            if (pos != RecyclerView.NO_POSITION) onItemLongClickListener?.invoke(pos)
+            false
+        }
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -138,7 +148,7 @@ abstract class BaseViewAdapter<T>(val list: MutableList<T> = mutableListOf()) : 
     fun update(obj: T, position: Int) {
         if (position in 0 until list.size) {
             list[position] = obj
-            notifyItemRangeChanged(position, position)
+            notifyItemChanged(position)
             dataChangeListener?.invoke(list)
         }
     }

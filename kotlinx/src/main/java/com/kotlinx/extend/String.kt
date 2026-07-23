@@ -163,7 +163,7 @@ fun String.speakQueue(): String {
 /*举例： "注意".logV() */
 fun String.logV(tag: String = "VERBOSE"): String {
     LogListener?.invoke(Log.VERBOSE, tag, this, null)
-    this.groupActual(4000).forEach { Log.v(tag, it.toString()) }
+    if (Kotlinx.IS_SHOW_LOG_VERBOSE) this.groupActual(4000).forEach { Log.v(tag, it.toString()) }
     return this
 }
 
@@ -171,7 +171,7 @@ fun String.logV(tag: String = "VERBOSE"): String {
 /*举例： "注意".logD() */
 fun String.logD(tag: String = "DEBUG"): String {
     LogListener?.invoke(Log.DEBUG, tag, this, null)
-    this.groupActual(4000).forEach { Log.d(tag, it.toString()) }
+    if (Kotlinx.IS_SHOW_LOG_DEBUG) this.groupActual(4000).forEach { Log.d(tag, it.toString()) }
     return this
 }
 
@@ -179,7 +179,7 @@ fun String.logD(tag: String = "DEBUG"): String {
 /*举例： "注意".logI() */
 fun String.logI(tag: String = "INFO"): String {
     LogListener?.invoke(Log.INFO, tag, this, null)
-    this.groupActual(4000).forEach { Log.i(tag, it.toString()) }
+    if (Kotlinx.IS_SHOW_LOG_INFO) this.groupActual(4000).forEach { Log.i(tag, it.toString()) }
     return this
 }
 
@@ -187,7 +187,7 @@ fun String.logI(tag: String = "INFO"): String {
 /*举例： "注意".logW() */
 fun String.logW(tag: String = "WARN"): String {
     LogListener?.invoke(Log.WARN, tag, this, null)
-    this.groupActual(4000).forEach { Log.w(tag, it.toString()) }
+    if (Kotlinx.IS_SHOW_LOG_WARN) this.groupActual(4000).forEach { Log.w(tag, it.toString()) }
     return this
 }
 
@@ -195,7 +195,7 @@ fun String.logW(tag: String = "WARN"): String {
 /*举例： "注意".logE() */
 fun String.logE(tag: String = "ERROR", t: Throwable? = null): String {
     LogListener?.invoke(Log.ERROR, tag, this, t)
-    this.groupActual(4000).forEach {
+    if (Kotlinx.IS_SHOW_LOG_ERROR) this.groupActual(4000).forEach {
         if (t == null) Log.e(tag, it.toString()) else Log.e(tag, it.toString(), t)
     }
     return this

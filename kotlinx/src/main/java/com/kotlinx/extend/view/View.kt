@@ -8,24 +8,23 @@ import android.view.MotionEvent
 import android.view.View
 
 /**
- * 键盘软键盘是否打开，打开返回true，view可以是任意view
+ * 键盘软键盘是否打开，打开返回 true，view 可以是任意 view。
+ * 注意：依赖可见区域高度差估算，全屏/刘海机型上可能不够精确。
  */
 fun View.monitorSoftKeyboard(activity: Activity, openListener: (Boolean) -> Unit) {
     this.viewTreeObserver.addOnGlobalLayoutListener {
         val rect = Rect()
         activity.window.decorView.getWindowVisibleDisplayFrame(rect) //获取当前界面可视部分
         val screenHeight: Int = activity.window.decorView.rootView.height //获取屏幕高度
-        val heiDifference: Int = screenHeight - rect.bottom //获取键盘高度，键盘没有弹出时，高度为0，键盘弹出时，高度为正数
-        if (heiDifference == 0) {
-            openListener(true)
-        } else {
-            openListener(false)
-        }
+        val heiDifference: Int = screenHeight - rect.bottom //键盘未弹出时约为 0，弹出时为正数
+        // heiDifference > 0 表示键盘打开
+        openListener(heiDifference > 0)
     }
 }
 
 /**
  * 防抖点击方法 自定义时长
+ * （setOnClickListener 本身已支持 Accessibility，勿在回调里再调 performClick，否则会死递归）
  */
 fun View.setCustomOnClickListener(debounceMs: Long = 500, action: (View) -> Unit) {
     var lastClickTime = 0L
@@ -34,10 +33,10 @@ fun View.setCustomOnClickListener(debounceMs: Long = 500, action: (View) -> Unit
         if (currentTime - lastClickTime >= debounceMs) {
             lastClickTime = currentTime
             action(this)
-            it.performClick() // 确保 Accessibility 支持
         }
     }
 }
+
 /**
  * 防抖点击方法 自定义时长
  */
@@ -48,7 +47,6 @@ fun View.debounceClick(debounceMs: Long = 500, action: (View) -> Unit) {
         if (currentTime - lastClickTime >= debounceMs) {
             lastClickTime = currentTime
             action(this)
-            it.performClick() // 确保 Accessibility 支持
         }
     }
 }
@@ -112,7 +110,6 @@ fun View.setCustomMultipleClickListener(doubleClickIntervalMs: Long = 3000, clic
             if (count == clickCount) {
                 action(this)
                 count = 0 // 重置计数
-                it.performClick() // Accessibility 支持
             }
         } else {
             count = 1 // 第一次点击

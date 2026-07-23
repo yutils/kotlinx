@@ -32,4 +32,19 @@ object Kotlinx {
         toast = null
         TTS.destroy()
     }
+
+    //是否在logcat中显示VERBOSE
+    var IS_SHOW_LOG_VERBOSE: Boolean = true
+
+    //是否在logcat中显示DEBUG
+    var IS_SHOW_LOG_DEBUG: Boolean = true
+
+    //是否在logcat中显示INFO
+    var IS_SHOW_LOG_INFO: Boolean = true
+
+    //是否在logcat中显示WARN
+    var IS_SHOW_LOG_WARN: Boolean = true
+
+    //是否在logcat中显示ERROR
+    var IS_SHOW_LOG_ERROR: Boolean = true
 }
