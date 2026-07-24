@@ -2,7 +2,14 @@ package com.kotlinx.test.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple200 = Color(0xFFBB86FC)
-val Purple500 = Color(0xFF6200EE)
-val Purple700 = Color(0xFF3700B3)
-val Teal200 = Color(0xFF03DAC5)
+val Ink = Color(0xFF0F172A)
+val InkSoft = Color(0xFF334155)
+val Paper = Color(0xFFF8FAFC)
+val PaperCard = Color(0xFFFFFFFF)
+val Accent = Color(0xFF0D9488)
+val AccentDark = Color(0xFF0F766E)
+val PassGreen = Color(0xFF16A34A)
+val FailRed = Color(0xFFDC2626)
+val IdleGray = Color(0xFF94A3B8)
+val ManualAmber = Color(0xFFD97706)
+val Line = Color(0xFFE2E8F0)
